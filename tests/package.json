@@ -1,0 +1,14 @@
+{
+  "name": "@gameboilerplate/tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "@types/jest": "^29.5.11",
+    "typescript": "^5.4.0"
+  }
+}
