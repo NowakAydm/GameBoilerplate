@@ -2,9 +2,19 @@
 
 > Vite + React admin dashboard for GameBoilerplate.
 
+## Tech Stack
+
+- React, Vite, TypeScript
+- zustand (state management)
+- Material UI (UI components)
+- Chart.js (charts)
+- React Router (routing)
+- Shared types/utilities from `@gameboilerplate/shared`
+
 ## Features
-- Modern React admin dashboard (Vite, TypeScript, MUI)
-- Imports shared types/utilities from `@gameboilerplate/shared`
+- Modern admin dashboard with charts and routing
+- State management with zustand
+- Material UI for rapid UI development
 
 ## Development
 ```sh

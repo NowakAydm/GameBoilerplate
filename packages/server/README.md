@@ -2,10 +2,21 @@
 
 > Express + TypeScript backend for GameBoilerplate.
 
+## Tech Stack
+
+- Express.js (REST API)
+- Socket.io (real-time communication)
+- Mongoose (MongoDB ODM)
+- JWT (authentication)
+- Zod (validation)
+- MongoDB (database)
+- Shared types/utilities from `@gameboilerplate/shared`
+
 ## Features
-- Express REST API
-- TypeScript-first development
-- Imports shared types/utilities from `@gameboilerplate/shared`
+- Real-time multiplayer backend
+- REST API with validation and authentication
+- MongoDB integration
+- Ready for integration and visual regression testing
 
 ## Development
 ```sh
@@ -24,3 +35,4 @@ Output is in the `dist/` folder.
 ```sh
 npm test
 ```
+Integration and visual regression: see `/tests` for Playwright/Supertest setup.
