@@ -40,15 +40,15 @@
 
 ## Tech Stack
 
-| Layer                    | Tech Stack                                                                                                 |
+| Layer                    | Tech Stack & Docs                                                                                                 |
 |--------------------------|-----------------------------------------------------------------------------------------------------------|
-| **Frontend Game Client** | React, Vite, TypeScript, zustand, r3f, @react-three/drei, r3f-perf, leva, Socket.io-client, GLTFLoader, Frustum Culling, ModelManager (with fallback) |
-| **Frontend Admin Panel** | React, zustand, Material UI, Chart.js, React Router                                                        |
-| **Backend API**          | Express.js, Socket.io, Mongoose, JWT, Zod, MongoDB                                                        |
-| **Visual Regression**    | Playwright (headless browser), Pixelmatch (image diff), PNG.js (parsing), custom canvas testing routes     |
-| **Unit & Integration**   | Jest, React Testing Library, Supertest, Vitest (optional for Vite)                                        |
-| **Dev & Tooling**        | Vite, ESLint, Prettier, Husky, Turborepo, dotenv, path aliases                                            |
-| **Other**                | GLTF Model Loader & Fallback System, Frustum Culling, optional Storybook for isolated component previews   |
+| **Frontend Game Client** | [React](https://react.dev), [Vite](https://vitejs.dev), [TypeScript](https://www.typescriptlang.org), [zustand](https://docs.pmnd.rs/zustand/getting-started/introduction), [react-three-fiber (r3f)](https://docs.pmnd.rs/react-three-fiber/), [@react-three/drei](https://docs.pmnd.rs/drei/introduction), [r3f-perf](https://github.com/RenaudRohlinger/r3f-perf), [leva](https://leva.pmnd.rs/), [Socket.io-client](https://socket.io/docs/v4/client-api/), [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader) |
+| **Frontend Admin Panel** | [React](https://react.dev), [zustand](https://docs.pmnd.rs/zustand/getting-started/introduction), [Material UI](https://mui.com/), [Chart.js](https://www.chartjs.org/), [React Router](https://reactrouter.com/)                                                        |
+| **Backend API**          | [Express.js](https://expressjs.com/), [Socket.io](https://socket.io/), [Mongoose](https://mongoosejs.com/), [JWT](https://jwt.io/), [Zod](https://zod.dev/), [MongoDB](https://www.mongodb.com/)                                                        |
+| **Visual Regression**    | [Playwright](https://playwright.dev/), [Pixelmatch](https://github.com/mapbox/pixelmatch), [PNG.js](https://github.com/lukeapage/pngjs)     |
+| **Unit & Integration**   | [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Supertest](https://github.com/ladjs/supertest), [Vitest](https://vitest.dev/)                                        |
+| **Dev & Tooling**        | [Vite](https://vitejs.dev/), [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/), [Turborepo](https://turbo.build/repo), [dotenv](https://github.com/motdotla/dotenv), path aliases                                            |
+| **Other**                | [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader), [Frustum Culling](https://threejs.org/docs/#api/en/math/Frustum), [Storybook](https://storybook.js.org/)   |
 
 ---
 
