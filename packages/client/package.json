@@ -28,6 +28,8 @@
     "vite": "^7.0.6"
   },
   "jest": {
-    "setupFilesAfterEnv": ["<rootDir>/src/setupTests.ts"]
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.ts"
+    ]
   }
 }

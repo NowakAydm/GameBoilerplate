@@ -1,4 +1,3 @@
-
 # GameBoilerplate Monorepo
 
 >A modern monorepo for full-stack TypeScript game projects using React, Express, and shared code, managed with Turborepo.
@@ -93,6 +92,22 @@ npx playwright test
 
 ---
 
+
+## WebSocket Actions & Events (Phase 2)
+
+- **JWT-Authenticated WebSocket:** All Socket.io connections require a valid JWT (guest, user, or admin). The server validates the token on connection and for all incoming actions.
+- **Shared Action/Event Schemas:** All game actions and events are defined and validated using shared Zod schemas in the `shared` package, ensuring type safety and preventing malformed data.
+- **Server-Side Validation:** Every incoming WebSocket action is validated on the server. Invalid or illegal actions are rejected, and an error event is broadcast to the client.
+- **Event Broadcasting:** The server emits game events to all relevant clients (e.g., player joined, action performed, error occurred) using the shared event schema.
+- **Sample Events:**
+  - `player:join` – Sent when a player joins the game.
+  - `player:move` – Broadcast when a player moves.
+  - `game:error` – Sent to a client if an invalid action is attempted.
+- **Anti-Cheat:**
+  - All actions are checked for legality (e.g., no teleporting, no item drops for guests).
+  - Attempts to cheat are logged and result in error events.
+
+---
 
 ## Tooling & CI
 

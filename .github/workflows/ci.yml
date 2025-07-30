@@ -9,6 +9,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [shared, client, admin, server]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,7 +19,21 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm install
-      - run: npm run build --workspaces
-      - run: npm test --workspaces
+      - run: npm run build --workspaces --if-present
+      - name: Run tests with coverage for ${{ matrix.package }}
+        run: npm test --workspace=packages/${{ matrix.package }} -- --coverage
+      - name: Upload coverage artifact for ${{ matrix.package }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.package }}
+          path: packages/${{ matrix.package }}/coverage
       - run: npm run lint || true
       - run: npm run format || true
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Deploy (placeholder)
+        run: echo "Deploy step goes here. Add your deployment script or action."
