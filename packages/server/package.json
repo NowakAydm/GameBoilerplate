@@ -1,0 +1,22 @@
+{
+  "name": "@gameboilerplate/server",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "echo \"No tests for this package\""
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/express": "^4.17.21",
+    "ts-node-dev": "^2.0.0"
+  }
+}
