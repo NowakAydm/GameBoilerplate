@@ -93,13 +93,20 @@ npx playwright test
 
 ---
 
+
 ## Tooling & CI
 
-- **Turborepo** for monorepo orchestration
-- **ESLint & Prettier** for linting/formatting
-- **Jest** for unit/integration testing
-- **Playwright, Pixelmatch, PNG.js** for visual regression
-- **GitHub Actions** for CI/CD
+- **Turborepo** – Monorepo task runner and orchestrator. Handles building, testing, and running scripts across all packages efficiently. [Docs](https://turbo.build/repo)
+- **ESLint** – Linter for TypeScript/JavaScript. Enforces code quality and style. [Docs](https://eslint.org/)
+- **Prettier** – Code formatter for consistent style. [Docs](https://prettier.io/)
+- **Jest** – Unit and integration testing framework for JavaScript/TypeScript. [Docs](https://jestjs.io/)
+- **Playwright** – End-to-end browser testing for UI and visual regression. [Docs](https://playwright.dev/)
+- **Pixelmatch** – Image comparison library for visual regression tests. [Docs](https://github.com/mapbox/pixelmatch)
+- **PNG.js** – PNG image parser/encoder used in visual regression. [Docs](https://github.com/lukeapage/pngjs)
+- **Husky** – Git hooks manager. Runs linting/tests before commits to ensure code quality. [Docs](https://typicode.github.io/husky/)
+- **lint-staged** – Runs linters on staged git files before commit. [Docs](https://github.com/okonet/lint-staged)
+- **dotenv** – Loads environment variables from `.env` files. [Docs](https://github.com/motdotla/dotenv)
+- **GitHub Actions** – CI/CD automation for building, testing, and deploying the monorepo. [Docs](https://docs.github.com/en/actions)
 
 ---
 
