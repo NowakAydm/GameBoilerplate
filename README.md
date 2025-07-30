@@ -1,18 +1,18 @@
 # GameBoilerplate Monorepo
 
->A modern monorepo for full-stack TypeScript game projects using React, Express, and shared code, managed with Turborepo.
+> A modern monorepo for full-stack TypeScript game projects using React, Express, and shared code, managed with Turborepo.
 
 ---
 
 ## Packages Overview
 
-| Package | Description | Docs |
-|---------|-------------|------|
+| Package                       | Description                                                      | Docs                                         |
+| ----------------------------- | ---------------------------------------------------------------- | -------------------------------------------- |
 | [`client`](./packages/client) | 3D game frontend built with React, Vite, r3f, zustand, and more. | [Client README](./packages/client/README.md) |
-| [`admin`](./packages/admin) | Admin dashboard with React, Material UI, Chart.js, zustand. | [Admin README](./packages/admin/README.md) |
-| [`server`](./packages/server) | Express backend API with Socket.io, MongoDB, JWT, Zod. | [Server README](./packages/server/README.md) |
-| [`shared`](./packages/shared) | Shared types, Zod schemas, and utilities for all packages. | [Shared README](./packages/shared/README.md) |
-| [`tests`](./tests) | Visual regression, unit, and integration tests. | [Tests README](./tests/README.md) |
+| [`admin`](./packages/admin)   | Admin dashboard with React, Material UI, Chart.js, zustand.      | [Admin README](./packages/admin/README.md)   |
+| [`server`](./packages/server) | Express backend API with Socket.io, MongoDB, JWT, Zod.           | [Server README](./packages/server/README.md) |
+| [`shared`](./packages/shared) | Shared types, Zod schemas, and utilities for all packages.       | [Shared README](./packages/shared/README.md) |
+| [`tests`](./tests)            | Visual regression, unit, and integration tests.                  | [Tests README](./tests/README.md)            |
 
 ---
 
@@ -39,21 +39,22 @@
 
 ## Tech Stack
 
-| Layer                    | Tech Stack & Docs                                                                                                 |
-|--------------------------|-----------------------------------------------------------------------------------------------------------|
+| Layer                    | Tech Stack & Docs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Frontend Game Client** | [React](https://react.dev), [Vite](https://vitejs.dev), [TypeScript](https://www.typescriptlang.org), [zustand](https://docs.pmnd.rs/zustand/getting-started/introduction), [react-three-fiber (r3f)](https://docs.pmnd.rs/react-three-fiber/), [@react-three/drei](https://docs.pmnd.rs/drei/introduction), [r3f-perf](https://github.com/RenaudRohlinger/r3f-perf), [leva](https://leva.pmnd.rs/), [Socket.io-client](https://socket.io/docs/v4/client-api/), [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader) |
-| **Frontend Admin Panel** | [React](https://react.dev), [zustand](https://docs.pmnd.rs/zustand/getting-started/introduction), [Material UI](https://mui.com/), [Chart.js](https://www.chartjs.org/), [React Router](https://reactrouter.com/)                                                        |
-| **Backend API**          | [Express.js](https://expressjs.com/), [Socket.io](https://socket.io/), [Mongoose](https://mongoosejs.com/), [JWT](https://jwt.io/), [Zod](https://zod.dev/), [MongoDB](https://www.mongodb.com/)                                                        |
-| **Visual Regression**    | [Playwright](https://playwright.dev/), [Pixelmatch](https://github.com/mapbox/pixelmatch), [PNG.js](https://github.com/lukeapage/pngjs)     |
-| **Unit & Integration**   | [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Supertest](https://github.com/ladjs/supertest), [Vitest](https://vitest.dev/)                                        |
-| **Dev & Tooling**        | [Vite](https://vitejs.dev/), [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/), [Turborepo](https://turbo.build/repo), [dotenv](https://github.com/motdotla/dotenv), path aliases                                            |
-| **Other**                | [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader), [Frustum Culling](https://threejs.org/docs/#api/en/math/Frustum), [Storybook](https://storybook.js.org/)   |
+| **Frontend Admin Panel** | [React](https://react.dev), [zustand](https://docs.pmnd.rs/zustand/getting-started/introduction), [Material UI](https://mui.com/), [Chart.js](https://www.chartjs.org/), [React Router](https://reactrouter.com/)                                                                                                                                                                                                                                                                                                                      |
+| **Backend API**          | [Express.js](https://expressjs.com/), [Socket.io](https://socket.io/), [Mongoose](https://mongoosejs.com/), [JWT](https://jwt.io/), [Zod](https://zod.dev/), [MongoDB](https://www.mongodb.com/)                                                                                                                                                                                                                                                                                                                                       |
+| **Visual Regression**    | [Playwright](https://playwright.dev/), [Pixelmatch](https://github.com/mapbox/pixelmatch), [PNG.js](https://github.com/lukeapage/pngjs)                                                                                                                                                                                                                                                                                                                                                                                                |
+| **Unit & Integration**   | [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Supertest](https://github.com/ladjs/supertest), [Vitest](https://vitest.dev/)                                                                                                                                                                                                                                                                                                                                     |
+| **Dev & Tooling**        | [Vite](https://vitejs.dev/), [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/), [Turborepo](https://turbo.build/repo), [dotenv](https://github.com/motdotla/dotenv), path aliases                                                                                                                                                                                                                                                                                            |
+| **Other**                | [GLTFLoader](https://threejs.org/docs/#examples/en/loaders/GLTFLoader), [Frustum Culling](https://threejs.org/docs/#api/en/math/Frustum), [Storybook](https://storybook.js.org/)                                                                                                                                                                                                                                                                                                                                                       |
 
 ---
 
 ## Package Usage Examples
 
 ### Client (Game Frontend)
+
 ```sh
 cd packages/client
 npm install
@@ -62,6 +63,7 @@ npm run dev
 ```
 
 ### Admin (Dashboard)
+
 ```sh
 cd packages/admin
 npm install
@@ -70,6 +72,7 @@ npm run dev
 ```
 
 ### Server (API)
+
 ```sh
 cd packages/server
 npm install
@@ -78,12 +81,15 @@ npm run dev
 ```
 
 ### Shared (Types/Utils)
+
 Import types or utilities in any package:
+
 ```ts
 import type { ExampleSharedType } from '@gameboilerplate/shared';
 ```
 
 ### Tests (Visual Regression, Unit, Integration)
+
 ```sh
 cd tests
 npx playwright test
@@ -91,7 +97,6 @@ npx playwright test
 ```
 
 ---
-
 
 ## WebSocket Actions & Events (Phase 2)
 
@@ -133,4 +138,5 @@ npx playwright test
 4. Open a pull request
 
 ---
+
 For more details, see the README in each package.

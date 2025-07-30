@@ -6,4 +6,3 @@ describe('shared zod schema', () => {
     expect(schema.parse({ foo: 'bar' })).toEqual({ foo: 'bar' });
   });
 });
-

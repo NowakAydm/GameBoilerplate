@@ -24,14 +24,9 @@ test('homepage visual regression', async ({ page }) => {
   const { width, height } = baseline;
   const diff = new PNG({ width, height });
 
-  const numDiffPixels = pixelmatch(
-    baseline.data,
-    current.data,
-    diff.data,
-    width,
-    height,
-    { threshold: 0.1 }
-  );
+  const numDiffPixels = pixelmatch(baseline.data, current.data, diff.data, width, height, {
+    threshold: 0.1,
+  });
 
   if (numDiffPixels > 0) {
     fs.mkdirSync('visual-diff', { recursive: true });

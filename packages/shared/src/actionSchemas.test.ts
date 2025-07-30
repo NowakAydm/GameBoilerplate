@@ -20,10 +20,19 @@ describe('GameActionSchema', () => {
 
 describe('GameEventSchema', () => {
   it('accepts valid item_drop event', () => {
-    expect(GameEventSchema.parse({ event: 'item_drop', item: 'Sword', by: { id: 'user1' } })).toBeTruthy();
+    expect(
+      GameEventSchema.parse({ event: 'item_drop', item: 'Sword', by: { id: 'user1' } }),
+    ).toBeTruthy();
   });
   it('accepts valid combat event', () => {
-    expect(GameEventSchema.parse({ event: 'combat', attacker: { id: 'user1' }, targetId: 'enemy-1', result: 'win' })).toBeTruthy();
+    expect(
+      GameEventSchema.parse({
+        event: 'combat',
+        attacker: { id: 'user1' },
+        targetId: 'enemy-1',
+        result: 'win',
+      }),
+    ).toBeTruthy();
   });
   it('rejects event with missing fields', () => {
     expect(() => GameEventSchema.parse({ event: 'combat', attacker: {}, result: 'win' })).toThrow();
