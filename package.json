@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "workspaces": [
     "packages/*",
-    "tests/*"
+    "tests"
   ],
   "devDependencies": {
     "@types/jest": "^30.0.0",
@@ -24,7 +24,17 @@
     "lint": "eslint . --ext .js,.ts,.tsx --ignore-path .gitignore",
     "format": "prettier --write .",
     "prepare": "husky",
-    "test": "npm run test --workspaces"
+    "test": "npm run test --workspace=tests",
+    "test:admin": "cd tests && node run-all-tests.js",
+    "test:admin:dashboard": "cd tests && node run-all-tests.js dashboard",
+    "test:admin:charts": "cd tests && node run-all-tests.js charts",
+    "test:admin:users": "cd tests && node run-all-tests.js users",
+    "test:admin:metrics": "cd tests && node run-all-tests.js metrics",
+    "test:admin:routes": "cd tests && node run-all-tests.js routes",
+    "dev:server": "npm run dev --workspace=packages/server",
+    "dev:client": "npm run dev --workspace=packages/client",
+    "dev:admin": "npm run dev --workspace=packages/admin",
+    "dev": "npx turbo run dev"
   },
   "dependencies": {
     "test": "^3.3.0"

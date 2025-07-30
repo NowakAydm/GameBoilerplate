@@ -98,6 +98,145 @@ npx playwright test
 
 ---
 
+## 📦 Project Dependencies
+
+### Root Dependencies (Monorepo Management)
+
+#### Development Tools
+- **[@typescript-eslint/eslint-plugin](https://typescript-eslint.io/)** `^7.5.0` - TypeScript-specific linting rules
+- **[@typescript-eslint/parser](https://typescript-eslint.io/)** `^7.5.0` - TypeScript parser for ESLint
+- **[eslint](https://eslint.org/)** `^8.56.0` - JavaScript/TypeScript linter for code quality
+- **[eslint-config-prettier](https://github.com/prettier/eslint-config-prettier)** `^10.1.8` - Disables ESLint rules that conflict with Prettier
+- **[eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)** `^5.1.3` - Runs Prettier as an ESLint rule
+- **[prettier](https://prettier.io/)** `^3.3.0` - Code formatter for consistent styling
+- **[husky](https://typicode.github.io/husky/)** `^9.1.7` - Git hooks for pre-commit quality checks
+- **[lint-staged](https://github.com/okonet/lint-staged)** `^15.5.2` - Run linters on staged files only
+- **[turbo](https://turbo.build/repo)** `^1.12.0` - Monorepo build system and task runner
+- **[typescript](https://www.typescriptlang.org/)** `^5.4.0` - TypeScript compiler and language support
+
+#### Testing & Quality
+- **[@types/jest](https://www.npmjs.com/package/@types/jest)** `^30.0.0` - TypeScript definitions for Jest
+- **[dotenv](https://github.com/motdotla/dotenv)** `^17.2.1` - Environment variable loader
+
+### Client Package (3D Game Frontend)
+
+#### Core Framework
+- **[react](https://react.dev/)** `^18.3.1` - UI library for building interactive components
+- **[react-dom](https://react.dev/)** `^18.3.1` - React renderer for web browsers
+- **[vite](https://vitejs.dev/)** `^7.0.6` - Fast build tool and development server
+
+#### 3D Graphics & Game Engine
+- **[three](https://threejs.org/)** `^0.178.0` - 3D graphics library for WebGL rendering
+- **[@react-three/fiber](https://docs.pmnd.rs/react-three-fiber/)** `^9.3.0` - React renderer for Three.js
+- **[@react-three/drei](https://docs.pmnd.rs/drei/introduction)** `^10.6.1` - Useful helpers and abstractions for R3F
+- **[three-stdlib](https://github.com/pmndrs/three-stdlib)** `^2.36.0` - Stand-alone Three.js utilities and helpers
+
+#### Development & Debugging
+- **[leva](https://leva.pmnd.rs/)** `^0.10.0` - GUI controls for tweaking game parameters
+- **[r3f-perf](https://github.com/RenaudRohlinger/r3f-perf)** `^7.2.3` - Performance monitor for React Three Fiber
+
+#### State & Communication
+- **[zustand](https://docs.pmnd.rs/zustand/)** `^5.0.6` - Lightweight state management library
+- **[socket.io-client](https://socket.io/docs/v4/client-api/)** `^4.8.1` - Real-time WebSocket client for multiplayer
+
+#### TypeScript Support
+- **[@types/react](https://www.npmjs.com/package/@types/react)** `^18.3.23` - TypeScript definitions for React
+- **[@types/react-dom](https://www.npmjs.com/package/@types/react-dom)** `^18.3.7` - TypeScript definitions for ReactDOM
+- **[@types/three](https://www.npmjs.com/package/@types/three)** `^0.178.1` - TypeScript definitions for Three.js
+
+### Admin Package (Dashboard Frontend)
+
+#### Core Framework
+- **[react](https://react.dev/)** `^18.3.1` - UI library for dashboard components
+- **[react-dom](https://react.dev/)** `^18.3.1` - React renderer for web browsers
+- **[react-router-dom](https://reactrouter.com/)** `^7.7.1` - Client-side routing for single-page apps
+
+#### UI Framework & Styling
+- **[@mui/material](https://mui.com/)** `^7.2.0` - Material-UI component library
+- **[@mui/icons-material](https://mui.com/material-ui/material-icons/)** `^7.2.0` - Material Design icons
+- **[@emotion/react](https://emotion.sh/docs/@emotion/react)** `^11.14.0` - CSS-in-JS library (MUI dependency)
+- **[@emotion/styled](https://emotion.sh/docs/@emotion/styled)** `^11.14.1` - Styled components for Emotion
+
+#### Charts & Data Visualization
+- **[chart.js](https://www.chartjs.org/)** `^4.5.0` - Flexible JavaScript charting library
+- **[react-chartjs-2](https://react-chartjs-2.js.org/)** `^5.3.0` - React wrapper for Chart.js
+- **[@mui/x-charts](https://mui.com/x/react-charts/)** `^8.9.0` - Advanced charting components from MUI
+
+#### State Management
+- **[zustand](https://docs.pmnd.rs/zustand/)** `^5.0.6` - Lightweight state management for admin data
+
+#### TypeScript Support
+- **[@types/react](https://www.npmjs.com/package/@types/react)** `^18.3.23` - TypeScript definitions for React
+- **[@types/react-dom](https://www.npmjs.com/package/@types/react-dom)** `^18.3.7` - TypeScript definitions for ReactDOM
+- **[@types/react-router-dom](https://www.npmjs.com/package/@types/react-router-dom)** `^5.3.3` - TypeScript definitions for React Router
+
+### Server Package (Backend API)
+
+#### Core Framework
+- **[express](https://expressjs.com/)** `^4.21.2` - Web framework for Node.js APIs
+- **[cors](https://github.com/expressjs/cors)** `^2.8.5` - Cross-Origin Resource Sharing middleware
+
+#### Real-time Communication
+- **[socket.io](https://socket.io/)** `^4.8.1` - Real-time WebSocket server for multiplayer features
+
+#### Database & ODM
+- **[mongoose](https://mongoosejs.com/)** `^8.17.0` - MongoDB object modeling and validation
+
+#### Authentication & Security
+- **[jsonwebtoken](https://jwt.io/)** `^9.0.2` - JWT token creation and verification
+- **[bcrypt](https://github.com/kelektiv/node.bcrypt.js)** `^6.0.0` - Password hashing and verification
+
+#### Validation & Environment
+- **[zod](https://zod.dev/)** `^4.0.14` - TypeScript-first schema validation
+- **[dotenv](https://github.com/motdotla/dotenv)** `^17.2.1` - Environment variable management
+
+#### Development Tools
+- **[ts-node-dev](https://github.com/wclr/ts-node-dev)** `^2.0.0` - TypeScript execution with hot reload
+
+#### TypeScript Support
+- **[@types/bcrypt](https://www.npmjs.com/package/@types/bcrypt)** `^6.0.0` - TypeScript definitions for bcrypt
+- **[@types/cors](https://www.npmjs.com/package/@types/cors)** `^2.8.19` - TypeScript definitions for CORS
+- **[@types/express](https://www.npmjs.com/package/@types/express)** `^4.17.23` - TypeScript definitions for Express
+- **[@types/jsonwebtoken](https://www.npmjs.com/package/@types/jsonwebtoken)** `^9.0.10` - TypeScript definitions for JWT
+
+### Shared Package (Common Types & Schemas)
+
+#### Validation & Schema
+- **[zod](https://zod.dev/)** `^4.0.14` - Runtime type validation and schema definition
+
+#### Testing
+- **[jest](https://jestjs.io/)** `^30.0.5` - Testing framework for shared utilities
+- **[ts-jest](https://kulshekhar.github.io/ts-jest/)** `^29.4.0` - TypeScript preprocessor for Jest
+- **[@types/jest](https://www.npmjs.com/package/@types/jest)** `^30.0.0` - TypeScript definitions for Jest
+
+### Tests Package (Testing Infrastructure)
+
+#### Testing Frameworks
+- **[jest](https://jestjs.io/)** `^30.0.5` - JavaScript testing framework
+- **[playwright](https://playwright.dev/)** `^1.54.1` - Browser automation for e2e testing
+- **[@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/)** `^16.3.0` - React component testing utilities
+- **[@testing-library/jest-dom](https://github.com/testing-library/jest-dom)** `^6.6.4` - Custom Jest matchers for DOM testing
+
+#### Test Configuration & Transpilation
+- **[babel-jest](https://jestjs.io/docs/getting-started#using-babel)** `^30.0.5` - Babel transformer for Jest
+- **[@babel/core](https://babeljs.io/docs/en/babel-core)** `^7.28.0` - Babel compiler core
+- **[@babel/preset-env](https://babeljs.io/docs/en/babel-preset-env)** `^7.28.0` - Babel preset for modern JavaScript
+- **[ts-jest](https://kulshekhar.github.io/ts-jest/)** `^29.1.1` - TypeScript preprocessor for Jest
+
+#### API & Integration Testing
+- **[supertest](https://github.com/ladjs/supertest)** `^7.1.4` - HTTP assertion library for testing APIs
+- **[node-fetch](https://github.com/node-fetch/node-fetch)** `^2.7.0` - HTTP client for mock server integration
+
+#### Visual Regression Testing
+- **[pixelmatch](https://github.com/mapbox/pixelmatch)** `^7.1.0` - Pixel-level image comparison
+- **[pngjs](https://github.com/lukeapage/pngjs)** `^7.0.0` - PNG image parsing for visual testing
+
+#### Mock Server (Tests)
+- **[express](https://expressjs.com/)** - Embedded in mock-server.js for realistic API simulation
+- **[cors](https://github.com/expressjs/cors)** - Cross-origin support for test server
+
+---
+
 ## WebSocket Actions & Events (Phase 2)
 
 - **JWT-Authenticated WebSocket:** All Socket.io connections require a valid JWT (guest, user, or admin). The server validates the token on connection and for all incoming actions.

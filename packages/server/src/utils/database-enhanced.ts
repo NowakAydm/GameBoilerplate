@@ -62,7 +62,6 @@ export class DatabaseConnection {
       
       // Fallback to mock mode if MongoDB connection fails
       console.log('🔄 Falling back to MOCK MODE for development');
-      process.env.MOCK_MODE = 'true'; // Set the environment variable for other services
       this.mockMode = true;
       this.isConnected = true;
     }

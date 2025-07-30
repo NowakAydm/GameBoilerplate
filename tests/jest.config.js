@@ -1,10 +1,27 @@
 /* eslint-env node */
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>'],
-  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+  testMatch: [
+    '**/*.jest.test.js',
+    '**/*.test.ts', 
+    '**/*.test.tsx'
+  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageDirectory: 'coverage',
-  collectCoverageFrom: ['**/*.{ts,tsx}', '!**/node_modules/**', '!**/dist/**'],
+  collectCoverageFrom: [
+    '**/*.{ts,tsx,js}', 
+    '!**/node_modules/**', 
+    '!**/dist/**',
+    '!**/run-all-tests.js',
+    '!**/test-admin.js',
+    '!**/*.test.js'
+  ],
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.js$': 'babel-jest'
+  },
+  testTimeout: 30000,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  verbose: true
 };

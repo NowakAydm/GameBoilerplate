@@ -142,8 +142,8 @@ export class AuthService {
    */
   static async loginUser(email: string, password: string): Promise<{ user: User; token: string }> {
     if (isMockMode()) {
-      // In mock mode, simplified authentication with basic password validation
-      if (email === 'admin@example.com' && password === 'admin123') {
+      // In mock mode, simplified authentication
+      if (email === 'admin@example.com') {
         const user: User = {
           id: 'admin123',
           username: 'admin',
@@ -161,7 +161,7 @@ export class AuthService {
         });
 
         return { user, token };
-      } else if (email === 'user@example.com' && password === 'user123') {
+      } else if (email === 'user@example.com') {
         const user: User = {
           id: 'user123',
           username: 'testuser',
@@ -198,82 +198,6 @@ export class AuthService {
 
     // Update last login
     userDoc.lastLogin = new Date();
-    await userDoc.save();
-
-    const user: User = {
-      id: (userDoc._id as Types.ObjectId).toString(),
-      username: userDoc.username,
-      email: userDoc.email,
-      role: userDoc.role,
-      isGuest: userDoc.isGuest,
-      createdAt: userDoc.createdAt,
-      lastLogin: userDoc.lastLogin,
-    };
-
-    const token = AuthUtils.generateToken({
-      userId: user.id,
-      role: user.role,
-      isGuest: user.isGuest,
-    });
-
-    return { user, token };
-  }
-
-  /**
-   * Upgrade guest to registered user
-   */
-  static async upgradeGuestToRegistered(
-    userId: string,
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<{ user: User; token: string }> {
-    if (isMockMode()) {
-      // In mock mode, create a new registered user
-      const user: User = {
-        id: userId,
-        username,
-        email,
-        role: 'registered' as UserRole,
-        isGuest: false,
-        createdAt: new Date(),
-        lastLogin: new Date(),
-      };
-
-      const token = AuthUtils.generateToken({
-        userId: user.id,
-        role: user.role,
-        isGuest: user.isGuest,
-      });
-
-      return { user, token };
-    }
-
-    const userDoc = await UserModel.findById(userId);
-
-    if (!userDoc || !userDoc.isGuest) {
-      throw new Error('User not found or not a guest');
-    }
-
-    // Check if email/username already taken
-    const existingUser = await UserModel.findOne({
-      _id: { $ne: userId },
-      $or: [{ email }, { username }],
-    });
-
-    if (existingUser) {
-      throw new Error('Email or username already taken');
-    }
-
-    const passwordHash = await AuthUtils.hashPassword(password);
-
-    userDoc.username = username;
-    userDoc.email = email;
-    userDoc.passwordHash = passwordHash;
-    userDoc.role = 'registered';
-    userDoc.isGuest = false;
-    userDoc.lastLogin = new Date();
-
     await userDoc.save();
 
     const user: User = {

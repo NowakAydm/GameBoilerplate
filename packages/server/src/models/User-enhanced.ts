@@ -15,12 +15,14 @@ const UserSchema = new Schema<IUser>(
   {
     username: {
       type: String,
+      unique: true,
       sparse: true,
       minlength: 3,
       maxlength: 20,
     },
     email: {
       type: String,
+      unique: true,
       sparse: true,
       lowercase: true,
     },
@@ -56,12 +58,11 @@ UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ isGuest: 1, createdAt: 1 });
 
 // Mock data for development without MongoDB
-const mockUsers: Array<Partial<IUser> & { _id: string; passwordHash?: string }> = [
+const mockUsers: Array<Partial<IUser> & { _id: string }> = [
   {
     _id: 'admin123',
     username: 'admin',
     email: 'admin@example.com',
-    passwordHash: '$2b$10$dummyhashforadminuser123456789', // In mock mode, any hash works
     role: 'admin',
     isGuest: false,
     createdAt: new Date(),
@@ -71,7 +72,6 @@ const mockUsers: Array<Partial<IUser> & { _id: string; passwordHash?: string }> 
     _id: 'user123',
     username: 'testuser',
     email: 'user@example.com',
-    passwordHash: '$2b$10$dummyhashfortestuser123456789',
     role: 'registered',
     isGuest: false,
     createdAt: new Date(),
