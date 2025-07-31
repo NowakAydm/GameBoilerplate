@@ -21,6 +21,7 @@
     "typescript": "^5.4.0"
   },
   "scripts": {
+    "build": "npx turbo run build",
     "lint": "eslint . --ext .js,.ts,.tsx --ignore-path .gitignore",
     "format": "prettier --write .",
     "prepare": "husky",

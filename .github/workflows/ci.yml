@@ -19,7 +19,8 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm install
-      - run: npm run build --workspaces --if-present
+      - name: Build ${{ matrix.package }} package
+        run: npm run build --workspace=packages/${{ matrix.package }}
       - name: Run tests with coverage for ${{ matrix.package }}
         run: npm test --workspace=packages/${{ matrix.package }} -- --coverage
       - name: Upload coverage artifact for ${{ matrix.package }}
