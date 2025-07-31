@@ -5,7 +5,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "cd ../../tests && npm run test:shared",
+    "test:coverage": "cd ../../tests && npm run test:shared:coverage"
   },
   "dependencies": {
     "zod": "^4.0.14"

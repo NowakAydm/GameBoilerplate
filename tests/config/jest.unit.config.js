@@ -8,9 +8,10 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   coverageDirectory: '../coverage/unit',
   collectCoverageFrom: [
-    '**/unit/**/*.{js,ts,tsx}',
+    '<rootDir>/../../packages/shared/src/**/*.{js,ts,tsx}',
     '!**/node_modules/**',
-    '!**/*.test.{js,ts,tsx}'
+    '!**/*.test.{js,ts,tsx}',
+    '!**/*.d.ts'
   ],
   transform: {
     '^.+\\.ts$': ['ts-jest', {

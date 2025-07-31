@@ -11,7 +11,8 @@
     "test:watch": "jest --config=config/jest.config.js --watch",
     "test:coverage": "jest --config=config/jest.config.js --coverage",
     "test:admin": "jest --config=config/jest.integration.config.js --testPathPatterns=admin",
-    "test:shared": "jest --config=config/jest.unit.config.js --testPathPatterns=shared"
+    "test:shared": "jest --config=config/jest.unit.config.js --testPathPatterns=shared",
+    "test:shared:coverage": "jest --config=config/jest.unit.config.js --testPathPatterns=shared --coverage"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
