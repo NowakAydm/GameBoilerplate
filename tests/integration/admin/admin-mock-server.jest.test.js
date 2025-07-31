@@ -7,11 +7,13 @@ const MockServer = require('./mock-server');
 
 describe('Admin Dashboard Tests with Mock Server', () => {
   let mockServer;
+  let localApiBase;
   
   // Start mock server before all tests
   beforeAll(async () => {
-    mockServer = new MockServer(3002); // Use different port to avoid conflicts
+    mockServer = new MockServer(); // Let it find available port automatically
     await mockServer.start();
+    localApiBase = `http://localhost:${mockServer.port}`;
   });
 
   // Stop mock server after all tests
@@ -21,7 +23,6 @@ describe('Admin Dashboard Tests with Mock Server', () => {
     }
   });
 
-  const API_BASE = 'http://localhost:3002';
   const ADMIN_CREDENTIALS = {
     username: 'admin',
     password: 'admin123'
@@ -29,7 +30,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
 
   // Helper function to get admin token
   const getAdminToken = async () => {
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
+    const response = await fetch(`${localApiBase}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ADMIN_CREDENTIALS)
@@ -40,7 +41,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
 
   describe('Authentication Tests', () => {
     test('should authenticate admin successfully', async () => {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${localApiBase}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ADMIN_CREDENTIALS)
@@ -53,7 +54,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
     });
 
     test('should reject invalid credentials', async () => {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${localApiBase}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'invalid', password: 'wrong' })
@@ -68,7 +69,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
   describe('Admin API Tests', () => {
     test('should fetch user metrics with valid token', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/users/metrics`, {
+      const response = await fetch(`${localApiBase}/api/admin/users/metrics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -82,7 +83,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
 
     test('should fetch user list with valid token', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/users`, {
+      const response = await fetch(`${localApiBase}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -94,12 +95,12 @@ describe('Admin Dashboard Tests with Mock Server', () => {
     });
 
     test('should block unauthorized access', async () => {
-      const response = await fetch(`${API_BASE}/api/admin/users/metrics`);
+      const response = await fetch(`${localApiBase}/api/admin/users/metrics`);
       expect(response.status).toBe(401);
     });
 
     test('should block access with invalid token', async () => {
-      const response = await fetch(`${API_BASE}/api/admin/users/metrics`, {
+      const response = await fetch(`${localApiBase}/api/admin/users/metrics`, {
         headers: { Authorization: 'Bearer invalid-token' }
       });
       expect(response.status).toBe(401);
@@ -109,7 +110,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
   describe('Chart Data Tests', () => {
     test('should provide user type chart data', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/charts/user-types`, {
+      const response = await fetch(`${localApiBase}/api/admin/charts/user-types`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -123,7 +124,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
 
     test('should provide activity chart data', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/charts/activity`, {
+      const response = await fetch(`${localApiBase}/api/admin/charts/activity`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -136,7 +137,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
 
     test('should provide game actions chart data', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/charts/game-actions`, {
+      const response = await fetch(`${localApiBase}/api/admin/charts/game-actions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -152,7 +153,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
   describe('Performance Metrics Tests', () => {
     test('should provide performance metrics', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/performance`, {
+      const response = await fetch(`${localApiBase}/api/admin/performance`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -169,7 +170,7 @@ describe('Admin Dashboard Tests with Mock Server', () => {
   describe('Data Validation Tests', () => {
     test('should calculate user percentages correctly', async () => {
       const token = await getAdminToken();
-      const response = await fetch(`${API_BASE}/api/admin/users/metrics`, {
+      const response = await fetch(`${localApiBase}/api/admin/users/metrics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -186,13 +187,13 @@ describe('Admin Dashboard Tests with Mock Server', () => {
       const token = await getAdminToken();
       
       // Get user metrics
-      const metricsResponse = await fetch(`${API_BASE}/api/admin/users/metrics`, {
+      const metricsResponse = await fetch(`${localApiBase}/api/admin/users/metrics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const metrics = await metricsResponse.json();
       
       // Get user list
-      const usersResponse = await fetch(`${API_BASE}/api/admin/users`, {
+      const usersResponse = await fetch(`${localApiBase}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const users = await usersResponse.json();

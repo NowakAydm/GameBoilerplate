@@ -1,34 +1,25 @@
-/* eslint-env node */
+// Jest setup for integration tests
 module.exports = {
   testEnvironment: 'node',
-  roots: ['<rootDir>/..'],
+  roots: ['<rootDir>/../integration'],
   testMatch: [
-    '**/unit/**/*.test.{js,ts,tsx}',
     '**/integration/**/*.test.{js,ts,tsx}',
-    '**/*.jest.test.js'
-  ],
-  testPathIgnorePatterns: [
-    'e2e',  // E2E tests use Playwright
-    'node_modules',
-    'coverage',
-    'dist',
-    'build'
+    '**/integration/**/*.jest.test.js'
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  coverageDirectory: '../coverage',
+  coverageDirectory: '../coverage/integration',
   collectCoverageFrom: [
-    '**/unit/**/*.{js,ts,tsx}',
     '**/integration/**/*.{js,ts,tsx}',
     '!**/node_modules/**',
-    '!**/coverage/**',
-    '!**/dist/**',
-    '!**/build/**',
-    '!**/utils/**',
     '!**/*.test.{js,ts,tsx}'
   ],
   transform: {
     '^.+\\.ts$': 'ts-jest',
+    '^.+\\.tsx$': 'ts-jest',
     '^.+\\.js$': 'babel-jest'
+  },
+  moduleNameMapper: {
+    '^@gameboilerplate/shared$': '<rootDir>/../../packages/shared/src/index.ts'
   },
   testTimeout: 30000,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],

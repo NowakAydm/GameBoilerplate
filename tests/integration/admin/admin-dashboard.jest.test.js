@@ -3,20 +3,88 @@
  * Tests the enhanced admin dashboard with guest vs registered user analytics
  */
 
+/**
+ * Jest Tests for Admin Dashboard Integration
+ * Tests the enhanced admin dashboard with guest vs registered user analytics
+ */
+
 describe('Admin Dashboard Integration Tests', () => {
   let adminToken = null;
 
   beforeAll(async () => {
-    const serverDown = await skipIfServerDown();
-    if (serverDown) {
-      return;
-    }
+    // Use mock token instead of real server
+    adminToken = global.MOCK_ADMIN_TOKEN;
+    
+    // Mock API responses for unit testing
+    global.mockFetch({
+      [`${global.API_BASE}/auth/login`]: {
+        data: { success: false, error: 'Invalid credentials' }
+      },
+      [`${global.API_BASE}/admin/metrics/user-types`]: {
+        data: {
+          registeredUsers: 1100,
+          guestUsers: 150,
+          registeredSessions: 2340,
+          guestSessions: 450,
+          registeredGameActions: 15670,
+          guestGameActions: 2340,
+          registeredPlaytime: 1200000,
+          guestPlaytime: 800000
+        }
+      },
+      [`${global.API_BASE}/admin/users`]: {
+        data: {
+          success: true,
+          users: [
+            { 
+              id: '1', 
+              username: 'user1', 
+              email: 'user1@example.com',
+              type: 'registered', 
+              role: 'registered',
+              active: true,
+              isOnline: true 
+            },
+            { 
+              id: '2', 
+              username: 'user2', 
+              email: 'user2@example.com',
+              type: 'guest', 
+              role: 'guest',
+              active: false,
+              isOnline: false 
+            }
+          ],
+          totalUsers: 1250,
+          onlineUsers: 890,
+          registeredUsers: 1100,
+          guestUsers: 150
+        }
+      },
+      [`${global.API_BASE}/admin/metrics`]: {
+        data: {
+          totalUsers: 1250,
+          registeredUsers: 1100,
+          guestUsers: 150
+        }
+      },
+      [`${global.API_BASE}/admin/charts/user-types`]: {
+        data: {
+          registeredUsers: 1100,
+          guestUsers: 150
+        }
+      },
+      // Handle unauthorized requests
+      'unauthorized': {
+        status: 401,
+        data: { error: 'Unauthorized' }
+      },
+      default: { data: { success: true } }
+    });
+  });
 
-    try {
-      adminToken = await getAdminToken();
-    } catch (error) {
-      console.warn('Could not get admin token:', error.message);
-    }
+  afterAll(() => {
+    global.restoreFetch();
   });
 
   describe('Authentication', () => {

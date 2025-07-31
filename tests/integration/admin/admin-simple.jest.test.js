@@ -6,7 +6,7 @@
 describe('Admin Dashboard Tests', () => {
   test('should load test environment correctly', () => {
     expect(typeof fetch).toBe('function');
-    expect(API_BASE).toBe('http://localhost:3001');
+    expect(API_BASE).toBe('http://localhost:3000');
     expect(ADMIN_EMAIL).toBe('admin@example.com');
   });
 

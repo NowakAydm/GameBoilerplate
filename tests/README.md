@@ -1,52 +1,237 @@
-# Enhanced Admin Dashboard Testing Suite
+# GameBoilerplate Test Suite
 
-This directory contains comprehensive unit tests for the enhanced admin dashboard with guest vs registered user analytics functionality.
+This directory contains a comprehensive, organized testing suite for the GameBoilerplate project with clear separation between different types of tests.
 
-## Test Coverage
+## 📁 Test Structure
 
-### 🎯 Core Testing Areas
-- **Admin Dashboard Frontend Components** - React components with Material-UI
-- **Chart Analytics** - Guest vs registered user metrics visualization  
-- **User Management** - Role-based filtering and user type analytics
-- **MetricsService** - Data collection and processing engine
-- **Admin API Routes** - Backend endpoints and authentication
-- **Real-time Analytics** - Live user session monitoring
-- **Data Consistency** - Cross-component data validation
-- **Security & Authorization** - Admin access controls
+```
+tests/
+├── unit/                    # Unit tests (fast, isolated)
+│   ├── shared/             # Shared package unit tests
+│   │   ├── engine/         # Game engine components
+│   │   │   ├── ActionSystem.test.ts
+│   │   │   ├── GameEngine.test.ts
+│   │   │   └── types.test.ts
+│   │   ├── index.test.ts   # Main shared package tests
+│   │   ├── actionSchemas.test.ts
+│   │   ├── example.test.ts
+│   │   └── README.md
+│   └── server/             # Server unit tests
+│       └── index.test.ts
+├── integration/            # Integration tests (component interaction)
+│   └── admin/              # Admin dashboard integration tests
+│       ├── admin-dashboard.jest.test.js
+│       ├── admin-dashboard.test.js
+│       ├── admin-mock-server.jest.test.js
+│       ├── admin-routes.test.js
+│       ├── admin-simple.jest.test.js
+│       ├── charts-analytics.jest.test.js
+│       ├── charts-analytics.test.js
+│       ├── metrics-service.test.js
+│       └── user-management.test.js
+├── e2e/                    # End-to-end tests (full user workflows)
+│   ├── visual-regression.test.ts
+│   ├── smoke.test.ts
+│   └── playwright.config.ts
+├── config/                 # Test configurations
+│   ├── jest.config.js      # Main Jest config
+│   ├── jest.unit.config.js # Unit test config
+│   ├── jest.integration.config.js # Integration test config
+│   ├── jest.setup.js       # Test setup and globals
+│   ├── .babelrc           # Babel configuration
+│   └── tsconfig.json      # TypeScript configuration
+└── utils/                  # Test utilities and helpers
+    ├── mock-server.js
+    ├── mock-server.enhanced.js
+    ├── run-all-tests.js
+    └── test-admin.js
+```
 
-## Test Files
+## 🚀 Quick Start
 
-### Core Test Suites
-- `admin-dashboard.test.js` - Frontend dashboard component tests
-- `charts-analytics.test.js` - Chart visualization and data tests  
-- `user-management.test.js` - User interface and filtering tests
-- `metrics-service.test.js` - Backend metrics collection tests
-- `admin-routes.test.js` - API endpoint and auth tests
+### Run All Tests
+```bash
+npm test
+```
 
-### Test Orchestration
-- `run-all-tests.js` - Comprehensive test runner
-- `test-admin.js` - Legacy admin authentication tests
+### Run Specific Test Types
+```bash
+# Unit tests only (fast)
+npm run test:unit
 
-### Legacy Testing (Visual Regression)
-- `visual-regression.test.ts` - Playwright visual testing
-- `playwright.config.ts` - Playwright configuration
-- `smoke.test.ts` - Basic functionality tests
+# Integration tests only
+npm run test:integration
 
-### Configuration Files
-- `jest.config.js` - Jest testing framework configuration
-- `package.json` - Test dependencies and scripts
+# End-to-end tests
+npm run test:e2e
 
-## Quick Start
+# All unit and integration tests
+npm run test:all
+```
 
-### Prerequisites
-1. **Server Running**: The backend server must be running for tests to work
-   ```bash
-   npm run dev:server
-   ```
+### Run Specific Component Tests
+```bash
+# Shared package tests
+npm run test:shared
 
-2. **Admin User**: Tests require an admin user with credentials:
-   - Email: `admin@example.com`
-   - Password: `admin123`
+# Admin dashboard tests
+npm run test:admin
+```
+
+### Development Workflow
+```bash
+# Watch mode for active development
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+## 🎯 Test Categories
+
+### Unit Tests (`/unit`)
+- **Purpose**: Test individual components in isolation
+- **Speed**: Very fast (< 5 seconds)
+- **Dependencies**: None (mocked)
+- **Coverage**: Shared package, server components
+- **Run with**: `npm run test:unit`
+
+### Integration Tests (`/integration`)
+- **Purpose**: Test component interactions and workflows
+- **Speed**: Moderate (5-30 seconds)
+- **Dependencies**: May require mock servers
+- **Coverage**: Admin dashboard, API endpoints, user flows
+- **Run with**: `npm run test:integration`
+
+### End-to-End Tests (`/e2e`)
+- **Purpose**: Test complete user workflows
+- **Speed**: Slow (30+ seconds)
+- **Dependencies**: Full application stack
+- **Coverage**: Visual regression, smoke tests
+- **Run with**: `npm run test:e2e`
+
+## 🔧 Configuration
+
+### Jest Configurations
+- **jest.config.js**: Main configuration for all tests
+- **jest.unit.config.js**: Optimized for fast unit tests
+- **jest.integration.config.js**: Setup for integration tests
+
+### Playwright Configuration
+- **playwright.config.ts**: E2E test configuration in `/e2e` directory
+
+## 📊 Test Coverage
+
+### Unit Tests Coverage
+- **Shared Package**: 81 tests covering schemas, engine, types
+- **Game Engine**: Complete lifecycle and entity management
+- **Action System**: Action registration, execution, cooldowns
+- **Type Validation**: Interface and structure validation
+
+### Integration Tests Coverage
+- **Admin Dashboard**: Component rendering and interactions
+- **Charts & Analytics**: Data visualization and metrics
+- **User Management**: Role-based filtering and operations
+- **API Routes**: Endpoint testing and authentication
+- **Real-time Features**: Live user session monitoring
+
+### E2E Tests Coverage
+- **Visual Regression**: UI consistency across updates
+- **Smoke Tests**: Critical path functionality
+- **Cross-browser Testing**: Compatibility verification
+
+## 🛠️ Adding New Tests
+
+### Unit Test
+```javascript
+// tests/unit/[component]/feature.test.ts
+describe('Feature Name', () => {
+  it('should do something specific', () => {
+    // Test implementation
+  });
+});
+```
+
+### Integration Test
+```javascript
+// tests/integration/[feature]/workflow.test.js
+describe('Feature Integration', () => {
+  beforeAll(async () => {
+    // Setup mock server or dependencies
+  });
+  
+  it('should handle complete workflow', async () => {
+    // Test implementation
+  });
+});
+```
+
+### E2E Test
+```typescript
+// tests/e2e/user-flow.test.ts
+import { test, expect } from '@playwright/test';
+
+test('user can complete workflow', async ({ page }) => {
+  // Test implementation
+});
+```
+
+## 🚨 Prerequisites
+
+### For Unit Tests
+- No additional setup required
+
+### For Integration Tests
+- Server may need to be running: `npm run dev:server`
+- Admin user credentials: `admin@example.com` / `admin123`
+
+### For E2E Tests
+- Full application stack running
+- All services available on expected ports
+
+## 📈 Performance Guidelines
+
+- **Unit Tests**: Should complete in < 5 seconds total
+- **Integration Tests**: Should complete in < 30 seconds total
+- **E2E Tests**: Budget 1-5 minutes depending on scope
+
+## 🔍 Debugging Tests
+
+### Debug Unit Tests
+```bash
+npm run test:unit -- --verbose --no-coverage
+```
+
+### Debug Integration Tests
+```bash
+npm run test:integration -- --verbose --detectOpenHandles
+```
+
+### Debug E2E Tests
+```bash
+npm run test:e2e -- --debug --headed
+```
+
+## 📝 Best Practices
+
+1. **Test Isolation**: Each test should be independent
+2. **Descriptive Names**: Use clear, specific test descriptions
+3. **Fast Feedback**: Keep unit tests fast and focused
+4. **Real Scenarios**: Integration tests should mirror real usage
+5. **Visual Validation**: Use E2E tests for UI consistency
+6. **Coverage Goals**: Aim for 80%+ unit test coverage
+7. **Documentation**: Update this README when adding new test types
+
+## 🏃‍♂️ CI/CD Integration
+
+Tests are organized to support different CI/CD stages:
+- **PR Checks**: Unit tests (fast feedback)
+- **Integration Builds**: Unit + Integration tests
+- **Release Pipeline**: Full test suite including E2E
+
+---
+
+*Last updated: July 31, 2025*
 
 ### Running Tests
 

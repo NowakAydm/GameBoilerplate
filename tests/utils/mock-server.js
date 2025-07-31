@@ -3,12 +3,17 @@ const cors = require('cors');
 
 // Mock server for testing
 class MockServer {
-  constructor(port = 3001) {
-    this.port = port;
+  constructor(port = null) {
+    this.port = port || this.findAvailablePort();
     this.app = express();
     this.server = null;
     this.setupMiddleware();
     this.setupRoutes();
+  }
+
+  findAvailablePort() {
+    // Start from 3001 and find next available
+    return 3001 + Math.floor(Math.random() * 1000);
   }
 
   setupMiddleware() {
@@ -159,14 +164,23 @@ class MockServer {
 
   async start() {
     return new Promise((resolve, reject) => {
-      this.server = this.app.listen(this.port, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(`Mock server running on port ${this.port}`);
-          resolve();
-        }
-      });
+      const tryStart = (port) => {
+        this.server = this.app.listen(port, (err) => {
+          if (err) {
+            if (err.code === 'EADDRINUSE') {
+              // Try next port
+              this.port = port + 1;
+              tryStart(this.port);
+            } else {
+              reject(err);
+            }
+          } else {
+            console.log(`Mock server running on port ${this.port}`);
+            resolve();
+          }
+        });
+      };
+      tryStart(this.port);
     });
   }
 
