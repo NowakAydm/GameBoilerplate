@@ -18,7 +18,9 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm install
+      - name: Clean install to fix rollup optional dependencies issue
+        run: rm -rf node_modules package-lock.json
+      - run: npm install --legacy-peer-deps
       - name: Build ${{ matrix.package }} package
         run: npm run build --workspace=packages/${{ matrix.package }}
       - name: Run tests with coverage for ${{ matrix.package }}
