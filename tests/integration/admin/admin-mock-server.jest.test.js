@@ -3,7 +3,7 @@
  * Tests that actually execute against a mock server instead of skipping
  */
 
-const MockServer = require('./mock-server');
+const MockServer = require('../../utils/mock-server');
 
 describe('Admin Dashboard Tests with Mock Server', () => {
   let mockServer;

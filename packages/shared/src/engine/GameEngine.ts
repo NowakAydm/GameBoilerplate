@@ -149,9 +149,17 @@ export class GameEngine extends EventEmitter implements IGameEngine {
     }
 
     if (system.destroy) {
-      system.destroy().catch(error => {
+      try {
+        const result = system.destroy();
+        // Handle both sync and async destroy methods
+        if (result && typeof result.catch === 'function') {
+          result.catch(error => {
+            console.error(`❌ Error destroying system ${name}:`, error);
+          });
+        }
+      } catch (error) {
         console.error(`❌ Error destroying system ${name}:`, error);
-      });
+      }
     }
 
     this.gameState.systems.delete(name);
