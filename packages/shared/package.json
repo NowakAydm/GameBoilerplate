@@ -5,15 +5,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf dist",
-    "test": "jest"
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "zod": "^4.0.14"
-  },
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "jest": "^30.0.5",
-    "ts-jest": "^29.4.0"
   }
 }

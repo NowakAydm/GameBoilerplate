@@ -3,6 +3,9 @@ import { z } from 'zod';
 // Re-export zod for convenience
 export { z };
 
+// Export engine components
+export * from './engine';
+
 // Shared types, schemas, and utilities will go here.
 
 export type ExampleSharedType = {
