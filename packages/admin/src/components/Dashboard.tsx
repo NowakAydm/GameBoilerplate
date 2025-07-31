@@ -125,9 +125,26 @@ export const Dashboard: React.FC = () => {
           registeredPlaytime: userTypesData.registeredPlaytime || 0,
           guestPlaytime: userTypesData.guestPlaytime || 0
         });
+        
+        // Debug logging for guest connection troubleshooting
+        console.log('📊 Dashboard metrics updated:', {
+          totalUsers: users.length,
+          onlineUsers: onlineUsers.length,
+          guestUsers: userTypesData.guestUsers || 0,
+          guestSessions: userTypesData.guestSessions || 0,
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
       console.error('Failed to fetch dashboard metrics:', error);
+      // Troubleshooting: Log specific error details for debugging guest connection issues
+      if (error instanceof Error) {
+        console.error('📊 Dashboard fetch error details:', {
+          message: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString()
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -135,7 +152,8 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardMetrics();
-    const interval = setInterval(fetchDashboardMetrics, 30000); // Refresh every 30 seconds
+    // Reduced interval from 30s to 5s for more real-time guest connection updates
+    const interval = setInterval(fetchDashboardMetrics, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -184,6 +202,27 @@ export const Dashboard: React.FC = () => {
 
       {loading && (
         <LinearProgress sx={{ mb: 3 }} />
+      )}
+
+      {/* Troubleshooting Alert for Guest Connection Issues */}
+      {metrics && metrics.guestUsers === 0 && metrics.onlineUsers > 0 && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          <strong>Guest Connection Debug:</strong> No guest users detected, but {metrics.onlineUsers} users are online. 
+          This may indicate:
+          <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+            <li>All online users are registered (normal)</li>
+            <li>WebSocket connection tracking is not working properly</li>
+            <li>Guest authentication tokens are not being generated correctly</li>
+          </ul>
+          Check browser console and server logs for connection details.
+        </Alert>
+      )}
+      
+      {metrics && metrics.onlineUsers === 0 && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <strong>No Active Connections:</strong> No users (guest or registered) are currently connected. 
+          Start a client session to see real-time connection data appear.
+        </Alert>
       )}
       
       {/* Key Metrics */}
