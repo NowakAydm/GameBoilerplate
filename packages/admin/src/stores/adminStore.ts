@@ -68,7 +68,7 @@ interface AdminActions {
   clearError: () => void;
 }
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3000';
 
 export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   // Initial state

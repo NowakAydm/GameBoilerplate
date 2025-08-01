@@ -4,7 +4,7 @@ import {
   System,
   ActionDefinition,
   Scene
-} from './types';
+} from './types.js';
 
 export class PluginSystem {
   private engine: IGameEngine;

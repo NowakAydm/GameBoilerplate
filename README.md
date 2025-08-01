@@ -4,6 +4,35 @@
 
 ---
 
+## Requirements
+
+- **Node.js**: 22.x or higher
+- **NPM**: 10.x or higher
+- **MongoDB**: 7.x or higher (for development)
+
+### Quick Node.js Setup
+
+If you don't have Node.js 22, you can use the provided setup scripts:
+
+**Windows:**
+```cmd
+setup-node.bat
+```
+
+**macOS/Linux:**
+```bash
+chmod +x setup-node.sh
+./setup-node.sh
+```
+
+Or manually with NVM:
+```bash
+nvm install 22
+nvm use 22
+```
+
+---
+
 ## Packages Overview
 
 | Package                       | Description                                                      | Docs                                         |
@@ -77,7 +106,7 @@ npm run dev
 cd packages/server
 npm install
 npm run dev
-# API at http://localhost:3001
+# API at http://localhost:3000
 ```
 
 ### Shared (Types/Utils)

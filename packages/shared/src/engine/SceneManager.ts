@@ -4,7 +4,7 @@ import {
   IGameEngine,
   GameEntity,
   Vector3
-} from './types';
+} from './types.js';
 
 export class SceneManager implements ISceneManager {
   public currentScene: Scene | null = null;

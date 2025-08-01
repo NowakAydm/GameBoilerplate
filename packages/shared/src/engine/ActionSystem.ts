@@ -6,7 +6,7 @@ import {
   ActionResult,
   IGameEngine,
   System
-} from './types';
+} from './types.js';
 
 export class ActionSystem implements IActionSystem, System {
   public name = 'ActionSystem';

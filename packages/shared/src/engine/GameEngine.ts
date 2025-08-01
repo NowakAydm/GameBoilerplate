@@ -9,7 +9,7 @@ import {
   GameEngineEvent,
   Vector3,
   EngineStats
-} from './types';
+} from './types.js';
 
 export class GameEngine extends EventEmitter implements IGameEngine {
   public gameState: GameState;

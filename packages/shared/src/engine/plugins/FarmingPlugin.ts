@@ -6,7 +6,7 @@ import {
   ActionDefinition,
   ActionContext,
   ActionResult
-} from '../types';
+} from '../types.js';
 import { z } from 'zod';
 
 // Example Custom Plugin: Farming System

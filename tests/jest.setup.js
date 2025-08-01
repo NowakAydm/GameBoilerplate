@@ -10,7 +10,7 @@ let mockServer = null;
 
 // Setup mock server before all tests
 beforeAll(async () => {
-  mockServer = new MockServer(3001);
+  mockServer = new MockServer(3000);
   await mockServer.start();
 });
 
@@ -34,7 +34,7 @@ global.cancelAnimationFrame = (id) => {
 };
 
 // Global test constants
-global.API_BASE = 'http://localhost:3001';
+global.API_BASE = 'http://localhost:3000';
 global.ADMIN_EMAIL = 'admin@example.com';
 global.ADMIN_PASSWORD = 'admin123';
 

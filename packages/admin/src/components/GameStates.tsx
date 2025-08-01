@@ -46,12 +46,16 @@ const GameStateModal: React.FC<GameStateModalProps> = ({ open, onClose, gameStat
   }, [gameState]);
 
   const handleSave = () => {
+    if (!editedState.trim()) {
+      alert('Cannot save: JSON is empty.');
+      return;
+    }
     try {
       const parsed = JSON.parse(editedState);
       onSave(gameState.userId, parsed);
       onClose();
     } catch (error) {
-      // Handle JSON parse error
+      alert('Invalid JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 

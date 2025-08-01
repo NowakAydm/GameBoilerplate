@@ -70,7 +70,7 @@ export const Users: React.FC = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch('http://localhost:3001/admin/users', {
+      const response = await fetch('http://localhost:3000/admin/users', {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -88,7 +88,7 @@ export const Users: React.FC = () => {
   const fetchUserDetail = async (userId: string) => {
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch(`http://localhost:3001/admin/user/${userId}`, {
+      const response = await fetch(`http://localhost:3000/admin/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -105,7 +105,7 @@ export const Users: React.FC = () => {
   const kickUser = async (userId: string) => {
     try {
       const token = localStorage.getItem('admin_token');
-      await fetch(`http://localhost:3001/admin/kick/${userId}`, {
+      await fetch(`http://localhost:3000/admin/kick/${userId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
