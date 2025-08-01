@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, AuthRequest } from '@gameboilerplate/shared';
+// Use local types to avoid Three.js conflicts
+import type { User, AuthRequest } from '../types/local';
 
 interface AuthState {
   user: User | null;
@@ -22,7 +23,7 @@ const API_BASE_URL = 'http://localhost:3001';
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // State
       user: null,
       token: null,

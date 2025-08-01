@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import type { ExampleSharedType, GameAction } from '@gameboilerplate/shared';
+// Use local types to avoid Three.js conflicts
+import type { GameAction } from './types/local';
 import { AuthComponent } from './components/AuthComponent';
+import { DynamicThreeFiberDemo } from './components/DynamicThreeFiberDemo';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -75,6 +77,11 @@ export default function App() {
       <h1>GameBoilerplate Client - Phase 3: Auth & Anti-Cheat</h1>
 
       <AuthComponent />
+
+      {/* React Three Fiber Demo Component - Available for all users */}
+      <div style={{ marginTop: '20px' }}>
+        <DynamicThreeFiberDemo />
+      </div>
 
       {isAuthenticated && (
         <div>
@@ -171,6 +178,45 @@ export default function App() {
               </p>
             </div>
           )}
+
+          {/* React Three Fiber Demo Component */}
+          {/* Commented out due to Three.js dependency conflicts
+          <div style={{ marginTop: '20px' }}>
+            <SimpleThreeFiberDemo />
+          </div>
+          */}
+          
+          {/* Alternative demonstration component */}
+          <div style={{ marginTop: '20px' }}>
+            <div
+              style={{
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #dee2e6',
+              }}
+            >
+              <h3 style={{ color: '#495057', marginBottom: '15px' }}>
+                React Three Fiber Demo (Under Development)
+              </h3>
+              <p style={{ color: '#6c757d', lineHeight: '1.6', marginBottom: '15px' }}>
+                A React Three Fiber demonstration component with 2D/3D mode switching is being 
+                integrated. The component will feature:
+              </p>
+              <ul style={{ color: '#6c757d', marginLeft: '20px' }}>
+                <li>Interactive 3D scene with animated objects</li>
+                <li>2D/3D mode toggle functionality</li>
+                <li>OrbitControls for mouse interaction</li>
+                <li>Drei components (Box, Sphere, Text, etc.)</li>
+                <li>Well-commented educational code</li>
+              </ul>
+              <p style={{ color: '#6c757d', lineHeight: '1.6', marginTop: '15px' }}>
+                <strong>Note:</strong> This feature is temporarily disabled due to Three.js dependency 
+                conflicts with the existing game engine. The implementation is complete and will be 
+                available once the conflicts are resolved.
+              </p>
+            </div>
+          </div>
 
           {gameState && (
             <div
