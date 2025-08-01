@@ -58,7 +58,11 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
 
         if (connectionStatus === 'connected' && user) {
           // Player position from game state or default
-          const playerPos = gameState?.player?.position || gameState?.entities?.[user.id]?.position || { x: 0, y: 0, z: 0 };
+          const playerPos =
+            gameState?.player?.position ||
+            gameState?.entities?.[user.id]?.position ||
+            gameState?.position ||
+            { x: 0, y: 0, z: 0 };
           
           // Create player cube
           const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -163,9 +167,14 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
         {user && <p><strong>Player:</strong> {user.username}</p>}
         {connectionStatus === 'connected' && gameState && (
           <p><strong>Position:</strong> {
-            gameState?.player?.position ? 
-            `(${gameState.player.position.x.toFixed(1)}, ${gameState.player.position.z.toFixed(1)})` :
-            '(0.0, 0.0)'
+            (() => {
+              const pos =
+                gameState?.position ||
+                gameState?.player?.position ||
+                (gameState?.entities?.[user.id]?.position) ||
+                { x: 0, y: 0, z: 0 };
+              return `(${pos.x.toFixed(1)}, ${pos.z.toFixed(1)})`;
+            })()
           }</p>
         )}
         <p><strong>3D Mode:</strong> {isInitialized ? 'Active' : 'Loading...'}</p>
@@ -181,7 +190,7 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
           maxWidth: '400px'
         }}>
           <button
-            onClick={() => handleGameAction({ type: 'move', direction: 'up' })}
+            onClick={() => handleGameAction({ type: 'move', direction: 'up', distance: 1, speed: 1 })}
             style={{
               padding: '6px 12px',
               backgroundColor: '#27ae60',
@@ -195,7 +204,7 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
             Move Up
           </button>
           <button
-            onClick={() => handleGameAction({ type: 'move', direction: 'down' })}
+            onClick={() => handleGameAction({ type: 'move', direction: 'down', distance: 1, speed: 1 })}
             style={{
               padding: '6px 12px',
               backgroundColor: '#27ae60',
@@ -209,7 +218,7 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
             Move Down
           </button>
           <button
-            onClick={() => handleGameAction({ type: 'move', direction: 'left' })}
+            onClick={() => handleGameAction({ type: 'move', direction: 'left', distance: 1, speed: 1 })}
             style={{
               padding: '6px 12px',
               backgroundColor: '#27ae60',
@@ -223,7 +232,7 @@ function Simple3DView({ gameState, connectionStatus, user, sendGameAction, isAut
             Move Left
           </button>
           <button
-            onClick={() => handleGameAction({ type: 'move', direction: 'right' })}
+            onClick={() => handleGameAction({ type: 'move', direction: 'right', distance: 1, speed: 1 })}
             style={{
               padding: '6px 12px',
               backgroundColor: '#27ae60',
@@ -309,7 +318,10 @@ function GameStatus2D({ gameState, connectionStatus, user, sendGameAction, isAut
 
     if (connectionStatus === 'connected' && user) {
       // Player position from game state or default
-      const playerPos = gameState?.player?.position || gameState?.entities?.[user.id]?.position || { x: 0, y: 0, z: 0 };
+      const playerPos =
+        gameState?.position ||
+        gameState?.entities?.[user.id]?.position ||
+        { x: 0, y: 0, z: 0 };
       
       // Draw player
       const playerX = centerX + (playerPos.x * gridSize);
@@ -411,9 +423,14 @@ function GameStatus2D({ gameState, connectionStatus, user, sendGameAction, isAut
         <div style={{ textAlign: 'center', marginBottom: '15px' }}>
           <p style={{ margin: '5px 0', fontSize: '14px' }}>
             Position: {
-              gameState?.player?.position ? 
-              `(${gameState.player.position.x.toFixed(1)}, ${gameState.player.position.z.toFixed(1)})` :
-              '(0.0, 0.0)'
+            (() => {
+              const pos =
+                gameState?.position ||
+                gameState?.player?.position ||
+                (gameState?.entities?.[user.id]?.position) ||
+                { x: 0, y: 0, z: 0 };
+              return `(${pos.x.toFixed(1)}, ${pos.z.toFixed(1)})`;
+            })()
             }
           </p>
           <p style={{ margin: '5px 0', fontSize: '14px' }}>

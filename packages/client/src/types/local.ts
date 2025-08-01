@@ -23,4 +23,6 @@ export interface GameAction {
   direction?: string;
   targetId?: string;
   item?: string;
+  distance?: number;
+  speed?: number;
 }
