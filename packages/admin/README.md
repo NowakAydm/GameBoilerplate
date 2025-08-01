@@ -1,5 +1,65 @@
 # @gameboilerplate/admin
 
+> **React + Material-UI admin dashboard** - Real-time monitoring and management interface for the GameBoilerplate multiplayer game server with comprehensive analytics.
+
+## 🎯 What This Package Does
+
+The admin package provides comprehensive server management:
+
+- **📊 Real-time Analytics** - Live server metrics, player statistics, and performance monitoring
+- **👥 User Management** - View, edit, and moderate user accounts and game data  
+- **🎮 Game Administration** - Monitor active games, player actions, and server health
+- **🛡️ Security Monitoring** - Anti-cheat alerts, suspicious activity tracking
+- **📈 Data Visualization** - Charts and graphs for usage patterns and trends
+
+## 🏗️ Architecture Integration
+
+```mermaid
+graph TB
+    subgraph "Admin Package"
+        D[Dashboard Components]
+        C[Charts & Visualizations]
+        UM[User Management]
+        RM[Real-time Metrics]
+        API[API Client]
+    end
+    
+    subgraph "Server Package"
+        REST[REST API Routes]
+        WS[WebSocket Server]
+        DB[(MongoDB)]
+        AUTH[JWT Middleware]
+    end
+    
+    subgraph "Shared Package"
+        TS[Type Schemas]
+        US[User Types]
+        MS[Metrics Types]
+    end
+    
+    D --> API
+    C --> API
+    UM --> API
+    RM --> WS
+    
+    API --> REST
+    RM --> WS
+    
+    REST --> AUTH
+    AUTH --> DB
+    WS --> DB
+    
+    D --> TS
+    UM --> US
+    RM --> MS
+    
+    style D fill:#e1f5fe
+    style REST fill:#e8f5e8
+    style TS fill:#fff3cd
+```
+
+---
+
 > Comprehensive React admin dashboard for GameBoilerplate with advanced analytics and testing infrastructure.
 
 ## 🚀 Features
