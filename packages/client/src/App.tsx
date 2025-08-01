@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 // Use local types to avoid Three.js conflicts
 import type { GameAction } from './types/local';
 import { AuthComponent } from './components/AuthComponent';
-import { WorkingThreeFiberDemo } from './components/WorkingThreeFiberDemo';
+import { GameVisualization } from './components/GameVisualization';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -78,10 +78,12 @@ export default function App() {
 
       <AuthComponent />
 
-      {/* React Three Fiber Demo Component - Available for all users */}
-      <div style={{ marginTop: '20px' }}>
-        <WorkingThreeFiberDemo />
-      </div>
+      {/* Game State Visualization - Available for all users */}
+      <GameVisualization 
+        gameState={gameState}
+        connectionStatus={connectionStatus}
+        user={user}
+      />
 
       {isAuthenticated && (
         <div>
@@ -90,6 +92,7 @@ export default function App() {
               padding: '20px',
               backgroundColor: '#e8f5e8',
               borderRadius: '8px',
+              marginTop: '20px',
               marginBottom: '20px',
             }}
           >
@@ -179,45 +182,6 @@ export default function App() {
             </div>
           )}
 
-          {/* React Three Fiber Demo Component */}
-          {/* Commented out due to Three.js dependency conflicts
-          <div style={{ marginTop: '20px' }}>
-            <SimpleThreeFiberDemo />
-          </div>
-          */}
-          
-          {/* Alternative demonstration component */}
-          <div style={{ marginTop: '20px' }}>
-            <div
-              style={{
-                padding: '20px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                border: '1px solid #dee2e6',
-              }}
-            >
-              <h3 style={{ color: '#495057', marginBottom: '15px' }}>
-                React Three Fiber Demo (Under Development)
-              </h3>
-              <p style={{ color: '#6c757d', lineHeight: '1.6', marginBottom: '15px' }}>
-                A React Three Fiber demonstration component with 2D/3D mode switching is being 
-                integrated. The component will feature:
-              </p>
-              <ul style={{ color: '#6c757d', marginLeft: '20px' }}>
-                <li>Interactive 3D scene with animated objects</li>
-                <li>2D/3D mode toggle functionality</li>
-                <li>OrbitControls for mouse interaction</li>
-                <li>Drei components (Box, Sphere, Text, etc.)</li>
-                <li>Well-commented educational code</li>
-              </ul>
-              <p style={{ color: '#6c757d', lineHeight: '1.6', marginTop: '15px' }}>
-                <strong>Note:</strong> This feature is temporarily disabled due to Three.js dependency 
-                conflicts with the existing game engine. The implementation is complete and will be 
-                available once the conflicts are resolved.
-              </p>
-            </div>
-          </div>
-
           {gameState && (
             <div
               style={{
@@ -251,7 +215,7 @@ export default function App() {
           borderRadius: '8px',
         }}
       >
-        <h3>Phase 3 Implementation Status</h3>
+        <h3>Integration Status</h3>
         <ul>
           <li>✅ JWT Authentication (Guest & Registered Users)</li>
           <li>✅ MongoDB User Storage</li>
@@ -260,6 +224,8 @@ export default function App() {
           <li>✅ Server-side Game State Management</li>
           <li>✅ Admin Role Support</li>
           <li>✅ Rate Limiting & Action Validation</li>
+          <li>✅ Three.js Game State Visualization</li>
+          <li>✅ 2D/3D Mode Switching</li>
         </ul>
       </div>
     </div>
