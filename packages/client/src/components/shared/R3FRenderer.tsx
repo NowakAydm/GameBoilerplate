@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 
 // Shared entity interface
 export interface SimpleEntity {
@@ -12,16 +11,14 @@ export interface SimpleEntity {
   color?: string;
 }
 
-// Entity renderer component that works in both 2D and 3D
+// Simple entity renderer component
 export function EntityRenderer({ entity }: { entity: SimpleEntity }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<any>(null);
 
-  // Animate entities slightly for visual appeal
-  useFrame((state) => {
-    if (meshRef.current) {
-      if (entity.type === 'player') {
-        meshRef.current.rotation.y += 0.01;
-      }
+  // Simple rotation animation for player
+  useFrame(() => {
+    if (meshRef.current && entity.type === 'player') {
+      meshRef.current.rotation.y += 0.01;
     }
   });
 
@@ -31,8 +28,6 @@ export function EntityRenderer({ entity }: { entity: SimpleEntity }) {
         return <boxGeometry args={[0.5, 0.5, 0.5]} />;
       case 'enemy':
         return <sphereGeometry args={[0.3, 8, 8]} />;
-      case 'item':
-        return <sphereGeometry args={[0.2, 6, 6]} />;
       default:
         return <boxGeometry args={[0.3, 0.3, 0.3]} />;
     }
@@ -42,14 +37,9 @@ export function EntityRenderer({ entity }: { entity: SimpleEntity }) {
     if (entity.color) return entity.color;
     
     switch (entity.type) {
-      case 'player':
-        return '#3498db';
-      case 'enemy':
-        return '#e74c3c';
-      case 'item':
-        return '#f39c12';
-      default:
-        return '#95a5a6';
+      case 'player': return '#3498db';
+      case 'enemy': return '#e74c3c';
+      default: return '#95a5a6';
     }
   };
 
@@ -58,8 +48,6 @@ export function EntityRenderer({ entity }: { entity: SimpleEntity }) {
       ref={meshRef}
       position={[entity.position.x, entity.position.y, entity.position.z]}
       scale={[entity.scale.x, entity.scale.y, entity.scale.z]}
-      castShadow
-      receiveShadow
     >
       {getGeometry()}
       <meshLambertMaterial color={getColor()} />
@@ -67,159 +55,67 @@ export function EntityRenderer({ entity }: { entity: SimpleEntity }) {
   );
 }
 
-// Ground plane component
-export function GroundPlane({ 
-  size = 10, 
-  color = '#95a5a6', 
-  wireframe = false 
-}: { 
-  size?: number; 
-  color?: string; 
-  wireframe?: boolean; 
-}) {
+// Simple ground plane
+export function GroundPlane() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[size, size, 10, 10]} />
-      <meshLambertMaterial 
-        color={color} 
-        wireframe={wireframe} 
-        transparent={wireframe} 
-        opacity={wireframe ? 0.3 : 1} 
-      />
+    <mesh rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[10, 10]} />
+      <meshLambertMaterial color="#95a5a6" wireframe />
     </mesh>
   );
 }
 
-// Lighting setup component
-export function SceneLighting() {
-  return (
-    <>
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-    </>
-  );
-}
-
-// Camera controller for different modes
-export function CameraController({ 
-  mode, 
-  playerPosition 
-}: { 
-  mode: '2d' | '3d'; 
-  playerPosition?: { x: number; y: number; z: number };
-}) {
-  useFrame((state) => {
-    if (mode === '2d' && playerPosition) {
-      // In 2D mode, follow the player from above
-      state.camera.position.set(
-        playerPosition.x,
-        10, // Fixed height above
-        playerPosition.z + 5 // Slightly offset for better view
-      );
-      state.camera.lookAt(playerPosition.x, 0, playerPosition.z);
-    }
-  });
-
-  if (mode === '2d') {
-    return (
-      <OrbitControls
-        enableRotate={false}
-        enableZoom={true}
-        enablePan={true}
-        maxPolarAngle={Math.PI / 3} // Limit rotation to keep top-down feel
-        minPolarAngle={Math.PI / 6}
-      />
-    );
-  }
-
-  return (
-    <OrbitControls
-      enableRotate={true}
-      enableZoom={true}
-      enablePan={true}
-    />
-  );
-}
-
-// Main R3F scene component that works for both 2D and 3D
+// Main R3F scene component
 export function R3FScene({
   mode,
   entities = [],
-  connectionStatus,
-  children
+  connectionStatus
 }: {
   mode: '2d' | '3d';
   entities: SimpleEntity[];
   connectionStatus: 'disconnected' | 'connecting' | 'connected';
-  children?: React.ReactNode;
 }) {
-  const playerEntity = entities.find(e => e.type === 'player');
-  
   // Camera settings based on mode
-  const cameraProps = mode === '2d' 
-    ? {
-        position: [0, 10, 5] as [number, number, number],
-        fov: 60,
-        near: 0.1,
-        far: 1000
-      }
-    : {
-        position: [8, 6, 8] as [number, number, number],
-        fov: 75,
-        near: 0.1,
-        far: 1000
-      };
-
-  const clearColor = connectionStatus === 'connected' ? '#2c3e50' : '#34495e';
-  const groundColor = connectionStatus === 'connected' ? '#95a5a6' : '#7f8c8d';
+  const cameraPosition = mode === '2d' 
+    ? [0, 10, 5] as [number, number, number]
+    : [8, 6, 8] as [number, number, number];
 
   return (
-    <Canvas
-      camera={cameraProps}
-      shadows
-      style={{ 
-        width: '400px', 
-        height: '400px',
-        border: mode === '2d' ? '2px solid #bdc3c7' : '2px solid #34495e',
-        borderRadius: '8px'
-      }}
-      onCreated={({ gl }) => {
-        gl.setClearColor(clearColor);
-      }}
-    >
-      <SceneLighting />
-      
-      <GroundPlane 
-        size={10} 
-        color={groundColor} 
-        wireframe={mode === '2d'} 
-      />
+    <div style={{ width: '400px', height: '400px' }}>
+      <Canvas
+        camera={{ position: cameraPosition, fov: 60 }}
+        style={{ 
+          border: '2px solid #bdc3c7',
+          borderRadius: '8px'
+        }}
+      >
+        {/* Lighting */}
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[10, 10, 5]} intensity={1} />
+        
+        {/* Ground */}
+        <GroundPlane />
 
-      {/* Render all entities */}
-      {entities.map(entity => (
-        <EntityRenderer key={entity.id} entity={entity} />
-      ))}
+        {/* Entities */}
+        {entities.map(entity => (
+          <EntityRenderer key={entity.id} entity={entity} />
+        ))}
 
-      {/* Default entity when disconnected */}
-      {connectionStatus !== 'connected' && entities.length === 0 && (
-        <mesh position={[0, 0.5, 0]}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshLambertMaterial color="#95a5a6" />
-        </mesh>
-      )}
+        {/* Default cube when no entities */}
+        {entities.length === 0 && (
+          <mesh position={[0, 0.5, 0]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshLambertMaterial color="#95a5a6" />
+          </mesh>
+        )}
 
-      <CameraController 
-        mode={mode} 
-        playerPosition={playerEntity?.position} 
-      />
-
-      {children}
-    </Canvas>
+        {/* Controls */}
+        <OrbitControls
+          enableRotate={mode === '3d'}
+          enableZoom={true}
+          enablePan={true}
+        />
+      </Canvas>
+    </div>
   );
 }

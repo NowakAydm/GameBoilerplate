@@ -164,65 +164,6 @@ function UnifiedR3FView({
   );
 }
 
-// Legacy 2D status display - now replaced with R3F-based rendering
-// Keeping this for reference - it used Canvas 2D API
-function GameStatus2DLegacy({ gameState, connectionStatus, user, sendGameAction, isAuthenticated }: GameVisualizationProps) {
-  const entitiesCount = getEntitiesCount(gameState);
-  
-  return (
-    <div style={{
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      borderRadius: '8px',
-      padding: '20px',
-      color: 'white',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    }}>
-      {/* Legacy Canvas 2D display - now using R3F instead */}
-      <div style={{
-        width: '300px',
-        height: '200px',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderRadius: '4px',
-        marginBottom: '15px',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '14px'
-      }}>
-        <p>2D Mode Now Uses R3F - See Above</p>
-      </div>
-      
-      {/* Connection Status */}
-      <div style={{ fontSize: '24px', marginBottom: '10px' }}>
-        {connectionStatus === 'connected' ? '🟢' : connectionStatus === 'connecting' ? '🟡' : '🔴'}
-      </div>
-      
-      <h3 style={{ margin: '0 0 10px 0' }}>Connection: {connectionStatus}</h3>
-      
-      {user && (
-        <p style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
-          Player: {user.username} ({user.role})
-        </p>
-      )}
-
-      {/* Game State Info */}
-      {connectionStatus === 'connected' && gameState && (
-        <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-          <p style={{ margin: '5px 0', fontSize: '14px' }}>
-            Position: {formatPosition(gameState, user)}
-          </p>
-          <p style={{ margin: '5px 0', fontSize: '14px' }}>
-            Entities: {entitiesCount} | Uptime: {gameState?.totalTime ? Math.floor(gameState.totalTime / 1000) : 0}s
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export const GameVisualization: React.FC<GameVisualizationProps> = ({ 
   gameState, 
   connectionStatus, 
