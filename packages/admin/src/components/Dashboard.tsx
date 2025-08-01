@@ -65,13 +65,13 @@ export const Dashboard: React.FC = () => {
       
       // Fetch users, metrics, and user types data
       const [usersResponse, metricsResponse, userTypesResponse] = await Promise.all([
-        fetch('http://localhost:3001/admin/users', {
+        fetch('http://localhost:3000/admin/users', {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch('http://localhost:3001/admin/metrics/charts', {
+        fetch('http://localhost:3000/admin/metrics/charts', {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch('http://localhost:3001/admin/metrics/user-types', {
+        fetch('http://localhost:3000/admin/metrics/user-types', {
           headers: { Authorization: `Bearer ${token}` },
         })
       ]);

@@ -4,7 +4,7 @@ import { z } from 'zod';
 export { z };
 
 // Export engine components
-export * from './engine';
+export * from './engine/index.js';
 
 // Shared types, schemas, and utilities will go here.
 

@@ -2,6 +2,10 @@
   "name": "@gameboilerplate/client",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,23 +13,23 @@
     "test": "echo \"No tests for this package\""
   },
   "dependencies": {
-    "@react-three/drei": "^10.6.1",
-    "@react-three/fiber": "^9.3.0",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "leva": "^0.10.0",
-    "r3f-perf": "^7.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.8.1",
-    "three": "^0.178.0",
+    "three": "^0.171.0",
     "three-stdlib": "^2.36.0",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
-    "@types/three": "^0.178.1",
-    "typescript": "^5.4.0",
-    "vite": "^7.0.6"
+    "@types/three": "^0.171.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
   },
   "jest": {
     "setupFilesAfterEnv": [

@@ -7,7 +7,7 @@ import {
   INetworkSystem,
   NetworkAction,
   NetworkEvent
-} from './types';
+} from './types.js';
 
 export class SystemManager {
   private engine: IGameEngine;

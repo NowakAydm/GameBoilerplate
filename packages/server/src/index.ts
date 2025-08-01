@@ -30,7 +30,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // Initialize database connection
 const db = DatabaseConnection.getInstance();

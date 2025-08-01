@@ -18,7 +18,7 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated && token) {
       setConnectionStatus('connecting');
-      const newSocket = io('http://localhost:3001', {
+      const newSocket = io('http://localhost:3000', {
         auth: { token },
       });
 
