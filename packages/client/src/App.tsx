@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 // Use local types to avoid Three.js conflicts
 import type { GameAction } from './types/local';
 import { AuthComponent } from './components/AuthComponent';
-import { DynamicThreeFiberDemo } from './components/DynamicThreeFiberDemo';
+import { WorkingThreeFiberDemo } from './components/WorkingThreeFiberDemo';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -80,7 +80,7 @@ export default function App() {
 
       {/* React Three Fiber Demo Component - Available for all users */}
       <div style={{ marginTop: '20px' }}>
-        <DynamicThreeFiberDemo />
+        <WorkingThreeFiberDemo />
       </div>
 
       {isAuthenticated && (
