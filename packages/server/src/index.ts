@@ -14,6 +14,7 @@ import {
 import { DatabaseConnection } from './utils/database';
 import { AuthUtils } from './utils/auth';
 import { AntiCheatService } from './services/AntiCheatService';
+import { metricsTracker } from './services/MetricsService';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from './middleware/auth';
@@ -93,6 +94,17 @@ io.on('connection', (socket) => {
   const user: JWTPayload = (socket as any).user;
   console.log('User connected:', { userId: user.userId, role: user.role, isGuest: user.isGuest });
 
+  // Track user connection in metrics - this was missing!
+  metricsTracker.trackUserConnection(
+    user.userId,
+    socket.id,
+    undefined, // username not available in JWT, could be added later
+    undefined, // email not available in JWT, could be added later  
+    user.role,
+    user.isGuest,
+    socket.handshake.headers['user-agent']
+  );
+
   // Initialize user's game state
   AntiCheatService.initializeUserState(user.userId);
 
@@ -131,6 +143,9 @@ io.on('connection', (socket) => {
     // Apply action effects to game state
     AntiCheatService.applyActionEffects(user.userId, sanitizedAction);
 
+    // Track game action in metrics for real-time statistics
+    metricsTracker.trackGameAction(user.userId, sanitizedAction.type);
+
     // Broadcast valid actions
     io.emit('gameUpdate', {
       user: {
@@ -163,8 +178,21 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Add handler for game state requests to track metrics
+  socket.on('getGameState', () => {
+    // Track game state request in metrics
+    metricsTracker.trackGameStateRequest(user.userId);
+    
+    // Return current game state
+    const gameState = AntiCheatService.getUserState(user.userId);
+    socket.emit('gameState', gameState);
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', { userId: user.userId, role: user.role });
+    
+    // Track user disconnection in metrics - this was missing!
+    metricsTracker.trackUserDisconnection(user.userId);
   });
 });
 

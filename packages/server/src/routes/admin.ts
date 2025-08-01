@@ -185,40 +185,36 @@ router.get('/metrics/user-types', (req: Request, res: Response) => {
   try {
     const gameMetrics = metricsTracker.getGameMetrics();
     
+    // Return the metrics in the format expected by the frontend
     const userTypeMetrics = {
-      totals: {
-        totalUsers: gameMetrics.totalUsers,
-        registeredUsers: gameMetrics.registeredUsers,
-        guestUsers: gameMetrics.guestUsers,
-      },
-      sessions: {
-        totalSessions: gameMetrics.totalGameSessions,
-        registeredSessions: gameMetrics.registeredSessions,
-        guestSessions: gameMetrics.guestSessions,
-      },
-      gameActions: {
-        totalGameActions: gameMetrics.totalGameActions,
-        registeredGameActions: gameMetrics.registeredGameActions,
-        guestGameActions: gameMetrics.guestGameActions,
-      },
-      playtime: {
-        totalPlaytime: gameMetrics.totalPlaytime,
-        registeredPlaytime: gameMetrics.registeredPlaytime,
-        guestPlaytime: gameMetrics.guestPlaytime,
-      },
-      percentages: {
-        registeredUserPercentage: gameMetrics.totalUsers > 0 ? Math.round((gameMetrics.registeredUsers / gameMetrics.totalUsers) * 100) : 0,
-        guestUserPercentage: gameMetrics.totalUsers > 0 ? Math.round((gameMetrics.guestUsers / gameMetrics.totalUsers) * 100) : 0,
-        registeredSessionPercentage: gameMetrics.totalGameSessions > 0 ? Math.round((gameMetrics.registeredSessions / gameMetrics.totalGameSessions) * 100) : 0,
-        guestSessionPercentage: gameMetrics.totalGameSessions > 0 ? Math.round((gameMetrics.guestSessions / gameMetrics.totalGameSessions) * 100) : 0,
-        registeredActionPercentage: gameMetrics.totalGameActions > 0 ? Math.round((gameMetrics.registeredGameActions / gameMetrics.totalGameActions) * 100) : 0,
-        guestActionPercentage: gameMetrics.totalGameActions > 0 ? Math.round((gameMetrics.guestGameActions / gameMetrics.totalGameActions) * 100) : 0,
-      },
+      registeredUsers: gameMetrics.registeredUsers,
+      guestUsers: gameMetrics.guestUsers,
+      registeredSessions: gameMetrics.registeredSessions,
+      guestSessions: gameMetrics.guestSessions,
+      registeredGameActions: gameMetrics.registeredGameActions,
+      guestGameActions: gameMetrics.guestGameActions,
+      registeredPlaytime: gameMetrics.registeredPlaytime,
+      guestPlaytime: gameMetrics.guestPlaytime,
+      
+      // Additional metadata for debugging
+      totalUsers: gameMetrics.totalUsers,
+      activeConnections: gameMetrics.activeConnections,
+      totalGameSessions: gameMetrics.totalGameSessions,
+      totalGameActions: gameMetrics.totalGameActions,
+      totalPlaytime: gameMetrics.totalPlaytime,
     };
+
+    // Debug logging for troubleshooting guest connection issues
+    console.log('📊 Serving user-types metrics:', {
+      guestUsers: gameMetrics.guestUsers,
+      registeredUsers: gameMetrics.registeredUsers,
+      activeConnections: gameMetrics.activeConnections,
+      timestamp: new Date().toISOString()
+    });
 
     res.json({
       success: true,
-      metrics: userTypeMetrics,
+      ...userTypeMetrics, // Flatten the structure for easier frontend access
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
