@@ -493,15 +493,38 @@ export const Charts: React.FC = () => {
     return () => clearInterval(interval);
   }, [timeRange]);
 
+  // Dynamic chart height based on screen size
+  const getChartHeight = (baseHeight: number) => {
+    const screenHeight = window.innerHeight;
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // On mobile, use smaller heights and consider screen space
+      return Math.min(baseHeight * 0.7, screenHeight * 0.3);
+    }
+    return baseHeight;
+  };
+
   const handleTimeRangeChange = (event: SelectChangeEvent) => {
     setTimeRange(event.target.value);
   };
 
+  // Mobile-optimized chart options
+  const isMobile = window.innerWidth < 768;
+
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: isMobile ? 'bottom' as const : 'top' as const,
+        labels: {
+          padding: isMobile ? 10 : 20,
+          usePointStyle: true,
+          font: {
+            size: isMobile ? 10 : 12,
+          },
+        },
       },
       title: {
         display: false,
@@ -510,28 +533,58 @@ export const Charts: React.FC = () => {
     scales: {
       y: {
         beginAtZero: true,
+        ticks: {
+          font: {
+            size: isMobile ? 9 : 11,
+          },
+        },
+      },
+      x: {
+        ticks: {
+          font: {
+            size: isMobile ? 9 : 11,
+          },
+          maxRotation: isMobile ? 45 : 0,
+          minRotation: isMobile ? 45 : 0,
+        },
       },
     },
   };
 
   const doughnutOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right' as const,
+        position: isMobile ? 'bottom' as const : 'right' as const,
+        labels: {
+          padding: isMobile ? 8 : 20,
+          usePointStyle: true,
+          font: {
+            size: isMobile ? 10 : 12,
+          },
+        },
       },
     },
   };
 
   const serverLoadOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index' as const,
       intersect: false,
     },
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: isMobile ? 'bottom' as const : 'top' as const,
+        labels: {
+          padding: isMobile ? 8 : 20,
+          usePointStyle: true,
+          font: {
+            size: isMobile ? 9 : 12,
+          },
+        },
       },
       title: {
         display: false,
@@ -541,30 +594,53 @@ export const Charts: React.FC = () => {
       x: {
         display: true,
         title: {
-          display: true,
-          text: 'Time (Hours)'
-        }
+          display: !isMobile,
+          text: 'Time (Hours)',
+          font: {
+            size: isMobile ? 9 : 12,
+          },
+        },
+        ticks: {
+          font: {
+            size: isMobile ? 8 : 11,
+          },
+          maxRotation: isMobile ? 45 : 0,
+          minRotation: isMobile ? 45 : 0,
+        },
       },
       y: {
         type: 'linear' as const,
         display: true,
         position: 'left' as const,
         title: {
-          display: true,
-          text: 'Percentage (%)'
+          display: !isMobile,
+          text: 'Percentage (%)',
+          font: {
+            size: isMobile ? 9 : 12,
+          },
         },
         max: 100,
+        ticks: {
+          font: {
+            size: isMobile ? 8 : 11,
+          },
+        },
       },
       y1: {
         type: 'linear' as const,
-        display: true,
+        display: !isMobile, // Hide second axis on mobile for clarity
         position: 'right' as const,
         title: {
-          display: true,
-          text: 'Network (MB/s)'
+          display: false,
+          text: 'Network (MB/s)',
         },
         grid: {
           drawOnChartArea: false,
+        },
+        ticks: {
+          font: {
+            size: isMobile ? 8 : 11,
+          },
         },
       },
     },
@@ -621,7 +697,7 @@ export const Charts: React.FC = () => {
                 User Activity Over Time (Registered vs Guest)
               </Typography>
               {userActivityData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Line data={userActivityData} options={chartOptions} />
                 </Box>
               )}
@@ -637,7 +713,7 @@ export const Charts: React.FC = () => {
                 User Type Distribution
               </Typography>
               {userTypeComparisonData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Doughnut data={userTypeComparisonData} options={doughnutOptions} />
                 </Box>
               )}
@@ -653,7 +729,7 @@ export const Charts: React.FC = () => {
                 Guest vs Registered User Activity Comparison
               </Typography>
               {guestVsRegisteredActivityData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Bar data={guestVsRegisteredActivityData} options={chartOptions} />
                 </Box>
               )}
@@ -669,7 +745,7 @@ export const Charts: React.FC = () => {
                 Average Engagement per User Type
               </Typography>
               {userTypeEngagementData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Bar data={userTypeEngagementData} options={chartOptions} />
                 </Box>
               )}
@@ -685,7 +761,7 @@ export const Charts: React.FC = () => {
                 Complete Role Distribution
               </Typography>
               {userRoleData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Doughnut data={userRoleData} options={doughnutOptions} />
                 </Box>
               )}
@@ -701,7 +777,7 @@ export const Charts: React.FC = () => {
                 Game Actions by User Type
               </Typography>
               {gameActionsData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Bar data={gameActionsData} options={chartOptions} />
                 </Box>
               )}
@@ -717,7 +793,7 @@ export const Charts: React.FC = () => {
                 Session Length by User Type
               </Typography>
               {sessionLengthData && (
-                <Box sx={{ height: 300 }}>
+                <Box sx={{ height: getChartHeight(300) }}>
                   <Bar data={sessionLengthData} options={chartOptions} />
                 </Box>
               )}
@@ -733,7 +809,7 @@ export const Charts: React.FC = () => {
                 Top Players by Playtime (Blue: Registered, Orange: Guest)
               </Typography>
               {playtimeData && (
-                <Box sx={{ height: 400 }}>
+                <Box sx={{ height: getChartHeight(400) }}>
                   <Bar data={playtimeData} options={chartOptions} />
                 </Box>
               )}
@@ -749,7 +825,7 @@ export const Charts: React.FC = () => {
                 Server Load Monitoring (Real-time)
               </Typography>
               {serverLoadData && (
-                <Box sx={{ height: 350 }}>
+                <Box sx={{ height: getChartHeight(350) }}>
                   <Line data={serverLoadData} options={serverLoadOptions} />
                 </Box>
               )}
@@ -765,7 +841,7 @@ export const Charts: React.FC = () => {
                 Server Performance
               </Typography>
               {serverPerformanceData && (
-                <Box sx={{ height: 350 }}>
+                <Box sx={{ height: getChartHeight(350) }}>
                   <Doughnut data={serverPerformanceData} options={doughnutOptions} />
                 </Box>
               )}
@@ -781,9 +857,10 @@ export const Charts: React.FC = () => {
                 Detailed Game Action Counts (Last 24 Hours)
               </Typography>
               {actionCountsData && (
-                <Box sx={{ height: 400 }}>
+                <Box sx={{ height: getChartHeight(400) }}>
                   <Bar data={actionCountsData} options={{
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                       legend: {
                         display: false
@@ -795,11 +872,19 @@ export const Charts: React.FC = () => {
                     scales: {
                       y: {
                         beginAtZero: true,
+                        ticks: {
+                          font: {
+                            size: isMobile ? 9 : 11,
+                          },
+                        },
                       },
                       x: {
                         ticks: {
-                          maxRotation: 45,
-                          minRotation: 45
+                          maxRotation: isMobile ? 90 : 45,
+                          minRotation: isMobile ? 90 : 45,
+                          font: {
+                            size: isMobile ? 8 : 10,
+                          },
                         }
                       }
                     }
