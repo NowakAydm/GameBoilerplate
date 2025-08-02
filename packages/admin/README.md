@@ -197,15 +197,19 @@ The admin dashboard expects these API endpoints:
 - `GET /api/health` - Server health check
 
 #### Admin Endpoints (require Bearer token)
-- `GET /api/admin/users/metrics` - User analytics data
-- `GET /api/admin/users` - User listing with pagination
-- `GET /api/admin/charts/user-types` - Chart data for user distribution
-- `GET /api/admin/charts/activity` - Daily activity trends
-- `GET /api/admin/charts/game-actions` - Game action breakdowns
-- `GET /api/admin/performance` - Server performance metrics
+- `GET /admin/stats` - Comprehensive server statistics
+- `GET /admin/users` - User listing with playtime and session data
+- `GET /admin/metrics/user-types` - User type breakdown (guest vs registered)
+- `GET /admin/metrics/charts` - Chart data for analytics dashboards
+- `GET /admin/game-states` - Active game states from AntiCheatService
+- `GET /admin/logs` - System logs with filtering and pagination
+- `GET /admin/user/:userId` - Detailed user information
+- `POST /admin/cleanup` - Force cleanup of inactive states
+- `POST /admin/kick/:userId` - Kick specific user
 
 ### Data Formats
 All API responses follow consistent JSON structure with:
+- **Real backend data** from MetricsService (not mock/random data)
 - User type categorization (guest vs registered)
 - Chart.js compatible data formats
 - Pagination support for large datasets
