@@ -3,7 +3,7 @@ const cors = require('cors');
 
 // Enhanced Mock server for comprehensive testing
 class MockServer {
-  constructor(port = 3001) {
+  constructor(port = 3000) {
     this.port = port;
     this.app = express();
     this.server = null;

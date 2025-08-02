@@ -12,8 +12,8 @@ class MockServer {
   }
 
   findAvailablePort() {
-    // Start from 3001 and find next available
-    return 3001 + Math.floor(Math.random() * 1000);
+    // Start from 3000 and find next available
+    return 3000 + Math.floor(Math.random() * 1000);
   }
 
   setupMiddleware() {

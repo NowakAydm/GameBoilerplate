@@ -399,12 +399,12 @@ node user-management.test.js
 
 ### Server Health Check
 ```bash
-curl http://localhost:3001/health
+curl http://localhost:3000/health
 ```
 
 ### Common Issues
 1. **Server Not Running**: Start with `npm run dev:server`
-2. **Wrong Port**: Verify server is on port 3001
+2. **Wrong Port**: Verify server is on port 3000
 3. **Admin Login Failed**: Check Mock Mode configuration
 4. **Database Connection**: Ensure fallback to Mock Mode works
 

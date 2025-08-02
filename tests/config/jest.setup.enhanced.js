@@ -10,7 +10,7 @@ let mockServer = null;
 
 // Setup enhanced mock server before all tests
 beforeAll(async () => {
-  mockServer = new MockServer(3001);
+  mockServer = new MockServer(3000);
   await mockServer.start();
   
   // Set a global flag that server is available
@@ -29,7 +29,7 @@ afterAll(async () => {
 global.fetch = require('node-fetch');
 
 // Global test constants
-global.API_BASE = 'http://localhost:3001';
+global.API_BASE = 'http://localhost:3000';
 global.ADMIN_EMAIL = 'admin@example.com';
 global.ADMIN_PASSWORD = 'admin123';
 

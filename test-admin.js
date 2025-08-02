@@ -5,7 +5,7 @@
  * This creates a test admin user and gets a JWT token for testing
  */
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = 'http://localhost:3000';
 
 async function testAdminAuth() {
   console.log('🧪 Testing Admin Dashboard Authentication...\n');

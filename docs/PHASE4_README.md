@@ -128,7 +128,7 @@ Navigate to `http://localhost:5174` and login with admin credentials.
 
 ### Environment Variables
 The admin dashboard uses the same environment configuration as the client:
-- `VITE_API_URL` - Server API base URL (defaults to http://localhost:3001)
+- `VITE_API_URL` - Server API base URL (defaults to http://localhost:3000)
 
 ### Server Configuration
 Admin routes are automatically included when the server starts. The admin routes:
