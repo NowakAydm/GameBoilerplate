@@ -40,7 +40,7 @@ try {
 }
 
 async function testChartsAnalytics() {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
   
   try {
     const loginResponse = await fetch(`${API_BASE}/auth/login`, {
@@ -81,7 +81,7 @@ async function testChartsAnalytics() {
 }
 
 async function testUserManagement() {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
   
   try {
     const loginResponse = await fetch(`${API_BASE}/auth/login`, {
@@ -124,7 +124,7 @@ async function testUserManagement() {
 }
 
 async function testMetricsService() {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
   
   try {
     const loginResponse = await fetch(`${API_BASE}/auth/login`, {
@@ -165,7 +165,7 @@ async function testMetricsService() {
 }
 
 async function testAdminRoutes() {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
   
   try {
     // Test unauthorized access
@@ -218,7 +218,7 @@ async function testAdminRoutes() {
 // Simple admin dashboard test
 async function runAdminDashboardTest() {
   console.log('🎨 Running Admin Dashboard tests...');
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = 'http://localhost:3000';
   
   try {
     const loginResponse = await fetch(`${API_BASE}/auth/login`, {
@@ -274,7 +274,7 @@ async function sleep(ms) {
 
 async function checkServerHealth() {
   try {
-    const response = await fetch('http://localhost:3001/health');
+    const response = await fetch('http://localhost:3000/health');
     return response.ok;
   } catch (error) {
     return false;

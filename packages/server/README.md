@@ -26,7 +26,7 @@ npm install
 npm run dev
 ```
 
-The server will start on [http://localhost:3001](http://localhost:3001) by default.
+The server will start on [http://localhost:3000](http://localhost:3000) by default.
 
 ## Build
 
