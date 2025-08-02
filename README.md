@@ -2,6 +2,38 @@
 
 > A comprehensive game development boilerplate featuring a modular ECS (Entity-Component-System) architecture, real-time multiplayer capabilities, and TypeScript-first development with shared state management across all packages.
 
+## 📚 Table of Contents
+
+- [🎯 What Makes This Special](#-what-makes-this-special)
+- [🏗️ Architecture Overview](#️-architecture-overview)
+- [📋 Requirements](#-requirements)
+- [📦 Package Architecture](#-package-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [🌐 Deployment on Render.com](#-deployment-on-rendercom)
+- [📊 Admin Dashboard & Real-time Analytics](#-admin-dashboard--real-time-analytics)
+- [🔄 Game State Management](#-game-state-management)
+- [🎮 Action Processing Flow](#-action-processing-flow)
+- [🧪 Testing](#-testing)
+- [🛠️ Development Tools](#️-development-tools)
+- [📊 Tech Stack Details](#-tech-stack-details)
+- [🤝 Contributing](#-contributing)
+- [📝 License](#-license)
+- [🎯 Roadmap](#-roadmap)
+- [🆘 Support](#-support)
+
+### 📖 Documentation Links
+
+| Document | Description |
+|----------|-------------|
+| [📋 Phase 1 README](./docs/PHASE1_README.md) | Initial setup and basic architecture |
+| [📋 Phase 2 README](./docs/PHASE2_README.md) | Server implementation and API |
+| [📋 Phase 3 README](./docs/PHASE3_README.md) | Client development and 3D integration |
+| [📋 Phase 4 README](./docs/PHASE4_README.md) | Admin dashboard and real-time analytics |
+| [📋 Phase 5 README](./docs/PHASE5_README.md) | Advanced features and optimization |
+| [🗺️ Project Roadmap](./docs/ROADMAP.md) | Detailed development roadmap |
+| [📖 Context Documentation](./docs/CONTEXT.md) | Project context and background |
+| [🔧 MongoDB Setup](./docs/MONGODB_SETUP.md) | Database configuration guide |
+
 ---
 
 ## 🎯 What Makes This Special
@@ -32,26 +64,26 @@ flowchart TD
     
     subgraph "📊 Admin Package"  
         A1["Admin Dashboard<br/>Management UI"]
-        A2["Live Analytics<br/>& Charts"]
-        A3["User & Server<br/>Monitoring"]
+        A2["Live Analytics<br/>Charts"]
+        A3["User Server<br/>Monitoring"]
     end
     
     subgraph "🖥️ Server Package"
         S1["Express REST API<br/>Authentication"]
         S2["Socket.io Server<br/>Real-time Sync"]
         S3["Metrics Service<br/>Analytics Engine"]
-        S4["Anti-cheat &<br/>Game Logic"]
+        S4["Anti-cheat<br/>Game Logic"]
     end
     
     subgraph "⚡ Shared Package"
         SH1["Game Engine Core<br/>ECS Architecture"]
-        SH2["Action System &<br/>Event Handling"]
-        SH3["Type Schemas &<br/>Validation (Zod)"]
+        SH2["Action System<br/>Event Handling"]
+        SH3["Type Schemas<br/>Validation"]
     end
     
     subgraph "💾 Data Layer"
         DB[(MongoDB<br/>Game Data)]
-        CACHE[(In-Memory<br/>Metrics Cache)]
+        CACHE[(Memory Cache<br/>Metrics)]
     end
 
     %% Client connections
@@ -80,12 +112,12 @@ flowchart TD
     SH3 --> A1
     SH2 --> S4
     
-    %% Styling for clarity
-    classDef clientStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef adminStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px  
-    classDef serverStyle fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
-    classDef sharedStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef dataStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    %% Enhanced styling for better readability
+    classDef clientStyle fill:#e8f4fd,stroke:#1976d2,stroke-width:3px,color:#000000,font-weight:bold
+    classDef adminStyle fill:#f8f0ff,stroke:#7b1fa2,stroke-width:3px,color:#000000,font-weight:bold
+    classDef serverStyle fill:#f0f8f0,stroke:#388e3c,stroke-width:3px,color:#000000,font-weight:bold
+    classDef sharedStyle fill:#fff8e1,stroke:#f57c00,stroke-width:3px,color:#000000,font-weight:bold
+    classDef dataStyle fill:#fdf2f8,stroke:#c2185b,stroke-width:3px,color:#000000,font-weight:bold
     
     class C1,C2,C3 clientStyle
     class A1,A2,A3 adminStyle
@@ -136,11 +168,11 @@ nvm use 22
 
 | Package | Purpose | Key Features | Documentation |
 |---------|---------|-------------|---------------|
-| **[`shared`](./packages/shared)** | Core game engine & types | ECS, Actions, Plugins, Schemas | [📖 Shared Docs](./packages/shared/README.md) |
-| **[`server`](./packages/server)** | Game server & API | Real-time sync, Auth, Anti-cheat, **MetricsService** | [📖 Server Docs](./packages/server/README.md) |
-| **[`client`](./packages/client)** | 3D game interface | React Three Fiber, Real-time UI | [📖 Client Docs](./packages/client/README.md) |
-| **[`admin`](./packages/admin)** | Management dashboard | **Real-time Analytics**, User management, **Live Charts** | [📖 Admin Docs](./packages/admin/README.md) |
-| **[`tests`](./tests)** | Testing infrastructure | Visual regression, Unit tests, **Mock Server** | [📖 Test Docs](./tests/README.md) |
+| **shared** | Core game engine & types | ECS, Actions, Plugins, Schemas | [📖 Shared Docs](./packages/shared/README.md) |
+| **server** | Game server & API | Real-time sync, Auth, Anti-cheat, MetricsService | [📖 Server Docs](./packages/server/README.md) |
+| **client** | 3D game interface | React Three Fiber, Real-time UI | [📖 Client Docs](./packages/client/README.md) |
+| **admin** | Management dashboard | Real-time Analytics, User management, Live Charts | [📖 Admin Docs](./packages/admin/README.md) |
+| **tests** | Testing infrastructure | Visual regression, Unit tests, Mock Server | [📖 Test Docs](./tests/README.md) |
 
 ---
 
@@ -416,6 +448,269 @@ cd packages/admin && npm run dev
 - **Client Game**: [http://localhost:5173](http://localhost:5173)
 - **Admin Dashboard**: [http://localhost:5174](http://localhost:5174) *(responsive design, works on mobile)*
 - **Server API**: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🌐 Deployment on Render.com
+
+Deploy your GameBoilerplate application to Render.com with these step-by-step instructions:
+
+### Prerequisites
+
+Before deploying, ensure you have:
+- A [Render.com](https://render.com) account
+- Your code pushed to a GitHub repository
+- MongoDB Atlas or another external database setup
+- Environment variables prepared
+
+### 1. Prepare Your Repository
+
+First, make sure your repository is properly configured:
+
+```bash
+# Build all packages to verify everything works
+npm run build
+
+# Run tests to ensure stability
+npm test
+
+# Commit and push your latest changes
+git add .
+git commit -m "Prepare for Render.com deployment"
+git push origin main
+```
+
+### 2. Deploy the Server (API)
+
+1. **Create Web Service for Server**:
+   - Go to [Render Dashboard](https://dashboard.render.com)
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Choose your GameBoilerplate repository
+
+2. **Configure Server Service**:
+   ```yaml
+   Name: gameboilerplate-server
+   Runtime: Node
+   Build Command: npm install && npm run build
+   Start Command: cd packages/server && npm start
+   ```
+
+3. **Environment Variables**:
+   ```env
+   NODE_ENV=production
+   PORT=3000
+   MONGODB_URI=mongodb+srv://your-atlas-connection-string
+   JWT_SECRET=your-super-secure-jwt-secret
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=secure-admin-password
+   CORS_ORIGIN=https://your-client-domain.onrender.com
+   ```
+
+4. **Advanced Settings**:
+   - **Auto-Deploy**: Enable for automatic deployments on git push
+   - **Health Check Path**: `/health` (if you have a health endpoint)
+
+### 3. Deploy the Client (Game Interface)
+
+1. **Create Static Site for Client**:
+   - Click "New +" → "Static Site"
+   - Connect the same repository
+
+2. **Configure Client Service**:
+   ```yaml
+   Name: gameboilerplate-client
+   Build Command: npm install && npm run build:client
+   Publish Directory: packages/client/dist
+   ```
+
+3. **Environment Variables**:
+   ```env
+   VITE_API_URL=https://your-server-domain.onrender.com
+   VITE_SOCKET_URL=https://your-server-domain.onrender.com
+   VITE_ENVIRONMENT=production
+   ```
+
+### 4. Deploy the Admin Dashboard
+
+1. **Create Static Site for Admin**:
+   - Click "New +" → "Static Site"
+   - Connect the same repository
+
+2. **Configure Admin Service**:
+   ```yaml
+   Name: gameboilerplate-admin
+   Build Command: npm install && npm run build:admin
+   Publish Directory: packages/admin/dist
+   ```
+
+3. **Environment Variables**:
+   ```env
+   VITE_API_URL=https://your-server-domain.onrender.com
+   VITE_ENVIRONMENT=production
+   ```
+
+### 5. Database Setup (MongoDB Atlas)
+
+Since Render.com doesn't provide MongoDB, use MongoDB Atlas:
+
+1. **Create MongoDB Atlas Cluster**:
+   - Go to [MongoDB Atlas](https://cloud.mongodb.com)
+   - Create a free M0 cluster
+   - Set up database user credentials
+   - Whitelist `0.0.0.0/0` for Render.com access
+
+2. **Get Connection String**:
+   ```
+   mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<database-name>?retryWrites=true&w=majority
+   ```
+
+### 6. Custom Build Scripts
+
+Add these scripts to your root `package.json` for Render.com:
+
+```json
+{
+  "scripts": {
+    "build": "turbo run build",
+    "build:client": "cd packages/client && npm run build",
+    "build:admin": "cd packages/admin && npm run build",
+    "build:server": "cd packages/server && npm run build",
+    "start:server": "cd packages/server && npm start"
+  }
+}
+```
+
+### 7. Deployment Configuration Files
+
+Create a `render.yaml` in your project root for Infrastructure as Code:
+
+```yaml
+services:
+  - type: web
+    name: gameboilerplate-server
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build:server
+    startCommand: npm run start:server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: gameboilerplate-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 3000
+
+  - type: web
+    name: gameboilerplate-client
+    runtime: static
+    buildCommand: npm install && npm run build:client
+    staticPublishPath: ./packages/client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://gameboilerplate-server.onrender.com
+
+  - type: web
+    name: gameboilerplate-admin
+    runtime: static
+    buildCommand: npm install && npm run build:admin
+    staticPublishPath: ./packages/admin/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://gameboilerplate-server.onrender.com
+
+databases:
+  - name: gameboilerplate-db
+    databaseName: gameboilerplate
+    user: gameuser
+```
+
+### 8. Post-Deployment Verification
+
+After deployment, verify everything works:
+
+1. **Check Server Health**:
+   ```bash
+   curl https://your-server-domain.onrender.com/health
+   ```
+
+2. **Test API Endpoints**:
+   ```bash
+   curl https://your-server-domain.onrender.com/api/auth/guest
+   ```
+
+3. **Verify Client Connection**:
+   - Visit your client URL
+   - Check browser console for connection errors
+   - Test authentication flow
+
+4. **Test Admin Dashboard**:
+   - Visit admin URL
+   - Login with admin credentials
+   - Verify real-time data is loading
+
+### 9. Monitoring and Maintenance
+
+1. **Set up Monitoring**:
+   - Enable Render.com metrics and alerts
+   - Monitor server logs in Render dashboard
+   - Set up MongoDB Atlas monitoring
+
+2. **Regular Maintenance**:
+   ```bash
+   # Check server logs
+   render logs --service gameboilerplate-server
+
+   # View deployment history
+   render deploys --service gameboilerplate-server
+   ```
+
+### 💡 Deployment Tips
+
+- **Cold Starts**: Free tier services sleep after 15 minutes of inactivity
+- **Custom Domains**: Upgrade to paid plan for custom domains
+- **SSL**: Automatic HTTPS on all Render.com services
+- **Auto-Deploy**: Push to main branch triggers deployment
+- **Environment Separation**: Use different branches for staging/production
+
+### 🚨 Troubleshooting Deployment
+
+**Common Issues and Solutions**:
+
+1. **Build Failures**:
+   ```bash
+   # Check build logs in Render dashboard
+   # Ensure all dependencies are in package.json
+   # Verify build commands work locally
+   ```
+
+2. **Connection Issues**:
+   ```env
+   # Verify CORS_ORIGIN includes your client domain
+   CORS_ORIGIN=https://your-client-domain.onrender.com
+   ```
+
+3. **Database Connection**:
+   ```env
+   # Check MongoDB Atlas IP whitelist
+   # Verify connection string format
+   # Test connection locally first
+   ```
+
+4. **WebSocket Issues**:
+   ```javascript
+   // Use HTTPS/WSS in production
+   const socket = io(process.env.VITE_SOCKET_URL, {
+     transports: ['websocket', 'polling']
+   });
+   ```
+
+---
 
 ## 🔧 Extending the Game Engine
 
