@@ -9,6 +9,7 @@ import { Users } from './components/Users';
 import { GameStates } from './components/GameStates';
 import { Logs } from './components/Logs';
 import { Charts } from './components/Charts';
+import { Backups } from './components/Backups';
 import { useAdminStore } from './stores/adminStore';
 
 const theme = createTheme({
@@ -101,6 +102,16 @@ export default function App() {
               <ProtectedRoute>
                 <Layout>
                   <Charts />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/backups"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Backups />
                 </Layout>
               </ProtectedRoute>
             }

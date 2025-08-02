@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -13,6 +13,9 @@ import {
   ListItemText,
   CssBaseline,
   Container,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -21,6 +24,8 @@ import {
   Article,
   BarChart,
   ExitToApp,
+  Menu as MenuIcon,
+  Backup,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAdminStore } from '../stores/adminStore';
@@ -33,6 +38,7 @@ const menuItems = [
   { text: 'Game States', path: '/game-states', icon: <Gamepad /> },
   { text: 'Logs', path: '/logs', icon: <Article /> },
   { text: 'Charts', path: '/charts', icon: <BarChart /> },
+  { text: 'Backups', path: '/backups', icon: <Backup /> },
 ];
 
 interface LayoutProps {
@@ -43,6 +49,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAdminStore();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const handleLogout = () => {
     logout();
@@ -51,7 +64,35 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const handleMenuClick = (path: string) => {
     navigate(path);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
   };
+
+  const drawer = (
+    <>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div">
+          Admin Panel
+        </Typography>
+      </Toolbar>
+      <Box sx={{ overflow: 'auto' }}>
+        <List>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                selected={location.pathname === item.path}
+                onClick={() => handleMenuClick(item.path)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </>
+  );
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -61,28 +102,58 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${drawerWidth}px)`,
-          ml: `${drawerWidth}px`,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
         }}
       >
         <Toolbar>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             GameBoilerplate Admin Dashboard
           </Typography>
           <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="body2">
-              Welcome, {user?.username || user?.email || 'Admin'}
-            </Typography>
+            {!isMobile && (
+              <Typography variant="body2">
+                Welcome, {user?.username || user?.email || 'Admin'}
+              </Typography>
+            )}
             <Button color="inherit" onClick={handleLogout} startIcon={<ExitToApp />}>
-              Logout
+              {isMobile ? '' : 'Logout'}
             </Button>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar */}
+      {/* Mobile Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+        }}
+      >
+        {drawer}
+      </Drawer>
+
+      {/* Desktop Sidebar */}
       <Drawer
         sx={{
+          display: { xs: 'none', md: 'block' },
           width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
@@ -93,26 +164,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         variant="permanent"
         anchor="left"
       >
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Admin Panel
-          </Typography>
-        </Toolbar>
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            {menuItems.map((item) => (
-              <ListItem key={item.text} disablePadding>
-                <ListItemButton
-                  selected={location.pathname === item.path}
-                  onClick={() => handleMenuClick(item.path)}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        {drawer}
       </Drawer>
 
       {/* Main Content */}
@@ -121,8 +173,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           flexGrow: 1,
           bgcolor: 'background.default',
-          p: 3,
-          width: `calc(100% - ${drawerWidth}px)`,
+          p: { xs: 2, md: 3 },
+          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
         }}
       >
         <Toolbar />

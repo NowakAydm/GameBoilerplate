@@ -3,6 +3,7 @@ import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { AntiCheatService } from '../services/AntiCheatService';
 import { UserModel } from '../models/User';
 import { metricsTracker } from '../services/MetricsService';
+import { backupService } from '../services/BackupService';
 
 const router = Router();
 
@@ -448,8 +449,189 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
   }
 });
 
+// ======================
+// BACKUP MANAGEMENT ROUTES
+// ======================
+
+/**
+ * GET /admin/backups - List all available backups
+ */
+router.get('/backups', async (req: Request, res: Response) => {
+  try {
+    const backups = await backupService.listBackups();
+    const stats = await backupService.getBackupStats();
+
+    res.json({
+      success: true,
+      backups,
+      stats,
+    });
+  } catch (error) {
+    console.error('Error listing backups:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to list backups',
+    });
+  }
+});
+
+/**
+ * POST /admin/backups/create - Create a new backup
+ */
+router.post('/backups/create', async (req: Request, res: Response) => {
+  try {
+    const { description } = req.body;
+    
+    addSystemLog('info', 'system', 'Manual backup initiated by admin', req.user?.userId, { description });
+    
+    const backup = await backupService.createBackup('manual', description);
+
+    res.json({
+      success: true,
+      backup,
+      message: 'Backup created successfully',
+    });
+  } catch (error) {
+    console.error('Error creating backup:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create backup',
+    });
+  }
+});
+
+/**
+ * GET /admin/backups/:backupId - Get backup details and data
+ */
+router.get('/backups/:backupId', async (req: Request, res: Response) => {
+  try {
+    const { backupId } = req.params;
+    const { includeData } = req.query;
+
+    const backups = await backupService.listBackups();
+    const backup = backups.find(b => b.id === backupId);
+
+    if (!backup) {
+      return res.status(404).json({
+        success: false,
+        error: 'Backup not found',
+      });
+    }
+
+    let backupData = null;
+    if (includeData === 'true') {
+      backupData = await backupService.loadBackup(backupId);
+    }
+
+    res.json({
+      success: true,
+      backup,
+      data: backupData,
+    });
+  } catch (error) {
+    console.error('Error fetching backup:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch backup details',
+    });
+  }
+});
+
+/**
+ * POST /admin/backups/:backupId/restore - Restore from backup (DANGEROUS!)
+ */
+router.post('/backups/:backupId/restore', async (req: Request, res: Response) => {
+  try {
+    const { backupId } = req.params;
+    const { confirmation } = req.body;
+
+    // Require explicit confirmation for restore operations
+    if (confirmation !== 'RESTORE_DATA_CONFIRMED') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restore operation requires explicit confirmation',
+        requiredConfirmation: 'RESTORE_DATA_CONFIRMED',
+      });
+    }
+
+    addSystemLog('warn', 'system', 'Data restore initiated by admin', req.user?.userId, { 
+      backupId,
+      warning: 'This will overwrite current data'
+    });
+
+    const result = await backupService.restoreFromBackup(backupId);
+
+    if (result.success) {
+      addSystemLog('info', 'system', 'Data restore completed', req.user?.userId, {
+        backupId,
+        restoredUsers: result.restored,
+      });
+    }
+
+    res.json({
+      success: result.success,
+      message: result.message,
+      restored: result.restored,
+    });
+  } catch (error) {
+    console.error('Error restoring backup:', error);
+    addSystemLog('error', 'system', `Restore failed: ${error}`, req.user?.userId, { backupId: req.params.backupId });
+    res.status(500).json({
+      success: false,
+      error: 'Failed to restore from backup',
+    });
+  }
+});
+
+/**
+ * DELETE /admin/backups/:backupId - Delete a backup
+ */
+router.delete('/backups/:backupId', async (req: Request, res: Response) => {
+  try {
+    const { backupId } = req.params;
+
+    const result = await backupService.deleteBackup(backupId);
+
+    if (result.success) {
+      addSystemLog('info', 'system', 'Backup deleted by admin', req.user?.userId, { backupId });
+    }
+
+    res.json({
+      success: result.success,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error('Error deleting backup:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete backup',
+    });
+  }
+});
+
+/**
+ * GET /admin/backups/stats - Get backup statistics
+ */
+router.get('/backups/stats', async (req: Request, res: Response) => {
+  try {
+    const stats = await backupService.getBackupStats();
+
+    res.json({
+      success: true,
+      stats,
+    });
+  } catch (error) {
+    console.error('Error fetching backup stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch backup statistics',
+    });
+  }
+});
+
 // Initialize with some sample logs
 addSystemLog('info', 'system', 'Admin routes initialized');
 addSystemLog('info', 'system', 'Enhanced metrics tracking started');
+addSystemLog('info', 'system', 'Backup service routes registered');
 
 export default router;

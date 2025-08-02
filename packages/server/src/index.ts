@@ -15,6 +15,7 @@ import { DatabaseConnection } from './utils/database';
 import { AuthUtils } from './utils/auth';
 import { AntiCheatService } from './services/AntiCheatService';
 import { metricsTracker } from './services/MetricsService';
+import { backupService } from './services/BackupService';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from './middleware/auth';
@@ -218,9 +219,12 @@ async function startServer() {
     // Connect to database
     await db.connect();
 
+    // Start daily backup schedule
+    backupService.startDailyBackupSchedule();
+
     server.listen(port, () => {
       console.log(`🚀 GameBoilerplate Server running at http://localhost:${port}`);
-      console.log(`📊 Features: Authentication ✅ Anti-Cheat ✅ WebSockets ✅`);
+      console.log(`📊 Features: Authentication ✅ Anti-Cheat ✅ WebSockets ✅ Backups ✅`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
