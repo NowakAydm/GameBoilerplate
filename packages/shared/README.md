@@ -1,45 +1,74 @@
 # @gameboilerplate/shared
 
-> Comprehensive game engine framework with ECS architecture, action system, and plugin support.
+> **The heart of the GameBoilerplate architecture** - A comprehensive TypeScript-first game engine featuring Entity-Component-System (ECS) architecture, real-time action processing, and extensible plugin system.
 
-## Tech Stack
+## 🌟 What's Inside
 
-- **TypeScript-first** - Full type safety and IntelliSense
-- **Zod** - Runtime validation for actions and data
-- **ECS Architecture** - Entity-Component-System pattern
-- **Plugin System** - Extensible architecture
-- **React Three Fiber** - 3D rendering integration
+The shared package is the foundation that powers all other packages in the monorepo:
 
-## Features
+- **🎮 Complete Game Engine** - ECS-based architecture with systems, entities, and components
+- **⚡ Action System** - Type-safe game actions with validation, cooldowns, and anti-cheat
+- **🔌 Plugin Architecture** - Extensible system for custom game mechanics
+- **🌐 Network Integration** - Real-time multiplayer support with WebSocket events
+- **🎨 React Three Fiber** - Automatic 3D visualization of game entities
+- **🛡️ Type Safety** - End-to-end TypeScript with Zod runtime validation
 
-### 🎮 Game Engine Core
-- **Entity-Component-System (ECS)** - Modular game object architecture
-- **Action System** - Type-safe game actions with validation and cooldowns
-- **System Manager** - Update loop management with priorities
-- **Scene Management** - Scene transitions with state persistence
-- **Plugin Architecture** - Extensible system for custom game mechanics
+## 🏗️ How It Powers Other Packages
 
-### 🌐 Network & Real-time
-- **WebSocket Integration** - Real-time multiplayer support
-- **Action Broadcasting** - Synchronized game state across clients
-- **Event System** - Custom game events with metadata
+```mermaid
+graph LR
+    subgraph "Shared Package Core"
+        E[Game Engine]
+        A[Action System] 
+        T[Type Definitions]
+        S[Schemas & Validation]
+        P[Plugin System]
+    end
+    
+    subgraph "Server Package"
+        SS[Server Game Engine]
+        WS[WebSocket Handler]
+        AS[Anti-cheat Service]
+    end
+    
+    subgraph "Client Package"
+        CG[3D Game Client]
+        UI[React Components]
+        ST[State Management]
+    end
+    
+    subgraph "Admin Package"
+        AD[Dashboard]
+        CH[Charts & Analytics]
+        UM[User Management]
+    end
+    
+    E --> SS
+    A --> WS
+    T --> CG
+    T --> AD
+    S --> AS
+    S --> UI
+    P --> SS
+    
+    style E fill:#e1f5fe
+    style A fill:#e8f5e8
+    style T fill:#fff3cd
+```
 
-### 🎨 Rendering & 3D
-- **React Three Fiber** - Automatic 3D visualization
-- **Entity Rendering** - Visual representation of game entities
-- **Real-time Updates** - Live synchronization between game state and visuals
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Basic Game Engine Setup
 
 ```typescript
-import { GameEngine, ActionSystem, SystemManager } from '@gameboilerplate/shared/engine';
+import { GameEngine, ActionSystem } from '@gameboilerplate/shared';
 
-// Create a new game engine
-const engine = new GameEngine();
+// Create and initialize engine
+const engine = new GameEngine({
+  tickRate: 60,
+  enableDebug: true
+});
 
-// Initialize with default systems
 await engine.init();
 
 // Create a player entity
@@ -51,38 +80,112 @@ player.properties = {
 };
 
 engine.addEntity(player);
-
-// Start the game loop
 engine.start();
 ```
 
-### Action System Usage
+### Real-World Usage Examples
+
+#### Server Integration
+```typescript
+// packages/server/src/index.ts
+import { ServerGameEngine } from '@gameboilerplate/shared';
+
+const gameEngine = new ServerGameEngine();
+await gameEngine.initialize();
+
+// Handle WebSocket actions
+socket.on('gameAction', async (data) => {
+  const result = await gameEngine.executeAction(
+    data.type,
+    data.payload,
+    { userId: socket.userId, engine: gameEngine }
+  );
+  
+  socket.emit('actionResult', result);
+});
+```
+
+#### Client Integration
+```typescript
+// packages/client/src/App.tsx
+import { GameAction, GameEvent } from '@gameboilerplate/shared';
+
+const sendPlayerAction = (action: GameAction) => {
+  socket.emit('gameAction', action);
+};
+
+// Type-safe action creation
+const movePlayer = () => {
+  sendPlayerAction({
+    type: 'movePlayer',
+    direction: 'north',
+    distance: 5
+  });
+};
+```
+
+## 🎮 Core Components
+
+### Game Engine
+
+The central coordinator for all game systems and entities:
+
+```typescript
+import { GameEngine, IGameEngine } from '@gameboilerplate/shared';
+
+const engine: IGameEngine = new GameEngine({
+  tickRate: 60,           // Updates per second
+  maxEntities: 1000,      // Entity limit
+  enableDebug: false,     // Debug logging
+  enableProfiling: true   // Performance monitoring
+});
+
+// Entity management
+const entity = engine.createEntity('player', { x: 10, y: 0, z: 5 });
+engine.addEntity(entity);
+
+// System management  
+engine.addSystem(new CustomSystem());
+
+// Get runtime statistics
+const stats = engine.getStats();
+console.log(`FPS: ${stats.fps}, Entities: ${stats.entityCount}`);
+```
+
+### Action System
+
+Type-safe game actions with automatic validation and cooldown management:
 
 ```typescript
 import { z } from 'zod';
 
-// Register a custom action
+// Define action schema
+const MovePlayerSchema = z.object({
+  direction: z.enum(['north', 'south', 'east', 'west']),
+  distance: z.number().min(1).max(10)
+});
+
+// Register action
 engine.registerAction({
   type: 'movePlayer',
-  schema: z.object({
-    direction: z.enum(['north', 'south', 'east', 'west']),
-    distance: z.number().min(1).max(10)
-  }),
+  schema: MovePlayerSchema,
   cooldown: 1000, // 1 second cooldown
   handler: async (data, context) => {
     const player = context.engine.getEntity(context.userId);
+    
     if (!player) {
       return { success: false, message: 'Player not found' };
     }
-
-    // Update player position
-    switch (data.direction) {
-      case 'north': player.position.z -= data.distance; break;
-      case 'south': player.position.z += data.distance; break;
-      case 'east': player.position.x += data.distance; break;
-      case 'west': player.position.x -= data.distance; break;
+    
+    // Update position based on direction
+    const { direction, distance } = data;
+    switch (direction) {
+      case 'north': player.position.z -= distance; break;
+      case 'south': player.position.z += distance; break;
+      case 'east': player.position.x += distance; break;
+      case 'west': player.position.x -= distance; break;
     }
-
+    
     return {
       success: true,
       data: { newPosition: player.position },
@@ -95,74 +198,64 @@ engine.registerAction({
   }
 });
 
-// Execute an action
+// Execute action (automatic validation and cooldown checking)
 const result = await engine.executeAction('movePlayer', {
   direction: 'north',
-  distance: 5
+  distance: 3
 }, { userId: 'player123', engine });
 ```
 
-### React Three Fiber Integration
+### Entity-Component-System (ECS)
 
-```tsx
-import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { GameEngine, useGameEngine, GameScene } from '@gameboilerplate/shared/engine';
-
-function GameComponent() {
-  const { engine, isLoading } = useGameEngine({
-    gameType: 'rpg',
-    userId: 'player123'
-  });
-
-  if (isLoading) return <div>Loading game...</div>;
-
-  return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <Canvas>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
-        <GameScene engine={engine} />
-      </Canvas>
-    </div>
-  );
-}
-```
-
-### Custom System Development
+Modular game object architecture for maximum flexibility:
 
 ```typescript
-import { System, GameState, IGameEngine } from '@gameboilerplate/shared/engine';
+import { GameEntity, System, GameState } from '@gameboilerplate/shared';
 
+// Create entities with components
+const player: GameEntity = {
+  id: 'player_001',
+  type: 'player',
+  position: { x: 0, y: 0, z: 0 },
+  rotation: { x: 0, y: 0, z: 0 },
+  scale: { x: 1, y: 1, z: 1 },
+  properties: {
+    // Components as properties
+    health: { current: 100, max: 100 },
+    inventory: { items: [], capacity: 20 },
+    skills: { level: 1, experience: 0 }
+  }
+};
+
+// Create systems to operate on entities
 class HealthRegenSystem implements System {
   name = 'HealthRegenSystem';
-  priority = 20;
+  priority = 10;
   enabled = true;
-
-  async init(engine: IGameEngine): Promise<void> {
-    console.log('Health regeneration system initialized');
-  }
 
   async update(deltaTime: number, gameState: GameState): Promise<void> {
     for (const entity of gameState.entities.values()) {
-      if (entity.type === 'player' && entity.properties.health < 100) {
-        // Regenerate 1 health per second
-        entity.properties.health = Math.min(100, 
-          entity.properties.health + deltaTime
-        );
+      if (entity.type === 'player' && entity.properties.health) {
+        const health = entity.properties.health;
+        if (health.current < health.max) {
+          // Regenerate 1 HP per second
+          health.current = Math.min(health.max, health.current + deltaTime / 1000);
+        }
       }
     }
   }
 }
 
-// Add to engine
+// Add system to engine
 engine.addSystem(new HealthRegenSystem());
 ```
 
-### Plugin Development
+### Plugin System
+
+Extensible architecture for game features:
 
 ```typescript
-import { GamePlugin, IGameEngine } from '@gameboilerplate/shared/engine';
+import { GamePlugin, IGameEngine } from '@gameboilerplate/shared';
 
 export class CombatPlugin implements GamePlugin {
   name = 'CombatPlugin';
@@ -172,7 +265,7 @@ export class CombatPlugin implements GamePlugin {
   async install(engine: IGameEngine): Promise<void> {
     // Add combat system
     engine.addSystem(new CombatSystem());
-
+    
     // Register combat actions
     engine.registerAction({
       type: 'attack',
@@ -183,199 +276,381 @@ export class CombatPlugin implements GamePlugin {
       cooldown: 2000,
       handler: this.handleAttack.bind(this)
     });
+    
+    console.log('⚔️ Combat plugin installed');
   }
 
   async uninstall(engine: IGameEngine): Promise<void> {
     engine.removeSystem('CombatSystem');
+    console.log('⚔️ Combat plugin uninstalled');
   }
 
   private async handleAttack(data: any, context: any) {
-    // Combat logic here
-    return { success: true };
+    // Combat logic implementation
+    const attacker = context.engine.getEntity(context.userId);
+    const target = context.engine.getEntity(data.targetId);
+    
+    // Calculate and apply damage
+    const damage = this.calculateDamage(attacker, data.attackType);
+    target.properties.health.current -= damage;
+    
+    return {
+      success: true,
+      data: { damage, targetHealth: target.properties.health.current },
+      events: [{
+        type: 'combat:attack',
+        data: { attackerId: context.userId, targetId: data.targetId, damage },
+        timestamp: Date.now()
+      }]
+    };
   }
 }
 
 // Install plugin
-const combatPlugin = new CombatPlugin();
-await engine.installPlugin(combatPlugin);
+await engine.installPlugin(new CombatPlugin());
 ```
 
-### Server-Side Integration
+## 🌐 Network Integration
+
+### Real-time Multiplayer Support
+
+The shared package provides the foundation for real-time multiplayer games:
 
 ```typescript
-import { ServerGameEngine } from '@gameboilerplate/shared/engine';
-import { Server } from 'socket.io';
-
-const io = new Server(server);
-const gameEngine = new ServerGameEngine();
-
-await gameEngine.init();
+// Server-side: Handle network actions
+import { GameActionSchema, GameEventSchema } from '@gameboilerplate/shared';
 
 io.on('connection', (socket) => {
-  // Handle engine actions
-  socket.on('engineAction', async (data) => {
+  socket.on('gameAction', async (data) => {
+    // Validate using shared schemas
+    const actionResult = GameActionSchema.safeParse(data);
+    if (!actionResult.success) {
+      socket.emit('actionError', { error: 'Invalid action format' });
+      return;
+    }
+    
+    // Process through engine
     const result = await gameEngine.executeAction(
-      data.type,
-      data.payload,
+      actionResult.data.type,
+      actionResult.data,
       { userId: socket.userId, engine: gameEngine }
     );
-
+    
+    // Send response
     socket.emit('actionResult', result);
-
-    // Broadcast events to all clients
+    
+    // Broadcast events
     if (result.events) {
       result.events.forEach(event => {
         io.emit('gameEvent', event);
       });
     }
   });
-
-  // Add player to game
-  gameEngine.addPlayer(socket.userId);
 });
 ```
 
-### Game Type Presets
-
 ```typescript
-// RPG Game Setup
-const rpgEngine = new GameEngine();
-await rpgEngine.init('rpg'); // Includes character, inventory, quest systems
+// Client-side: Send actions and handle events
+import { GameAction, GameEvent } from '@gameboilerplate/shared';
 
-// RTS Game Setup  
-const rtsEngine = new GameEngine();
-await rtsEngine.init('rts'); // Includes unit, resource, building systems
+// Type-safe action sending
+const castSpell = (targetId: string, spellType: string) => {
+  const action: GameAction = {
+    type: 'castSpell',
+    targetId,
+    spellType,
+    manaCost: 20
+  };
+  
+  socket.emit('gameAction', action);
+};
 
-// MMO Game Setup
-const mmoEngine = new GameEngine();
-await mmoEngine.init('mmo'); // Includes player, guild, world systems
-
-// Custom Game Setup
-const customEngine = new GameEngine();
-await customEngine.init('custom'); // Minimal setup, add your own systems
+// Handle events with proper typing
+socket.on('gameEvent', (event: GameEvent) => {
+  switch (event.type) {
+    case 'spell:cast':
+      playSpellAnimation(event.data);
+      break;
+    case 'player:joined':
+      addPlayerToScene(event.data);
+      break;
+  }
+});
 ```
 
-## API Reference
+## 🎨 React Three Fiber Integration
+
+Automatic 3D visualization of game entities:
+
+```tsx
+import React from 'react';
+import { Canvas } from '@react-three/fiber';
+import { GameEngine, useGameEngine, GameScene } from '@gameboilerplate/shared';
+
+function GameComponent() {
+  const { engine, entities, isLoading } = useGameEngine({
+    gameType: 'rpg',
+    userId: 'player123',
+    serverUrl: 'ws://localhost:3000'
+  });
+
+  if (isLoading) return <div>Loading game...</div>;
+
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Canvas camera={{ position: [10, 10, 10] }}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        
+        {/* Automatically render all entities */}
+        <GameScene engine={engine} />
+        
+        {/* Or manually render specific entities */}
+        {entities.map(entity => (
+          <EntityRenderer key={entity.id} entity={entity} />
+        ))}
+      </Canvas>
+    </div>
+  );
+}
+
+// Custom entity renderer
+function EntityRenderer({ entity }: { entity: GameEntity }) {
+  return (
+    <mesh position={[entity.position.x, entity.position.y, entity.position.z]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={entity.type === 'player' ? 'blue' : 'red'} />
+    </mesh>
+  );
+}
+```
+
+## 🎯 Game Type Presets
+
+Pre-configured setups for different game genres:
+
+```typescript
+// RPG Game - Character progression, inventory, quest systems
+const rpgEngine = new GameEngine();
+await rpgEngine.init('rpg');
+// Includes: CharacterSystem, InventorySystem, QuestSystem, ExperienceSystem
+
+// RTS Game - Units, resources, building systems  
+const rtsEngine = new GameEngine();
+await rtsEngine.init('rts');
+// Includes: UnitSystem, ResourceSystem, BuildingSystem, PathfindingSystem
+
+// MMO Game - Large-scale multiplayer systems
+const mmoEngine = new GameEngine();
+await mmoEngine.init('mmo');
+// Includes: GuildSystem, ChatSystem, InstanceSystem, EconomySystem
+
+// Custom Game - Minimal setup, add your own systems
+const customEngine = new GameEngine();
+await customEngine.init('custom');
+// Includes: Only core EntitySystem and ActionSystem
+```
+
+## 📚 API Reference
 
 ### Core Classes
 
 #### GameEngine
-- `init(gameType?: string)` - Initialize engine with optional game type preset
-- `start()` - Start the game loop
-- `stop()` - Stop the game loop
-- `createEntity(type, position)` - Create a new game entity
-- `addEntity(entity)` - Add entity to game state
-- `removeEntity(id)` - Remove entity from game state
-- `executeAction(type, data, context)` - Execute a game action
-- `registerAction(definition)` - Register a new action type
-
-#### ActionSystem
-- `registerAction(definition)` - Register action with validation schema
-- `executeAction(type, data, context)` - Execute action with validation
-- `isOnCooldown(userId, actionType)` - Check if action is on cooldown
-
-#### SystemManager
-- `addSystem(system)` - Add system to update loop
-- `removeSystem(name)` - Remove system by name
-- `getSystem(name)` - Get system instance
-- `update(deltaTime)` - Update all systems
-
-### Plugin System
-
-#### Creating Plugins
 ```typescript
-interface GamePlugin {
-  name: string;
-  version: string;
-  dependencies?: string[];
-  install(engine: IGameEngine): Promise<void>;
-  uninstall(engine: IGameEngine): Promise<void>;
+interface IGameEngine {
+  // Lifecycle
+  init(gameType?: string): Promise<void>;
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  
+  // Entity Management
+  createEntity(type: string, position?: Vector3): GameEntity;
+  addEntity(entity: GameEntity): void;
+  removeEntity(id: string): void;
+  getEntity(id: string): GameEntity | undefined;
+  getEntitiesByType(type: string): GameEntity[];
+  
+  // System Management
+  addSystem(system: System): void;
+  removeSystem(name: string): void;
+  getSystem<T extends System>(name: string): T | undefined;
+  
+  // Action Processing
+  registerAction(definition: ActionDefinition): void;
+  executeAction(type: string, data: any, context: ActionContext): Promise<ActionResult>;
+  
+  // Events
+  emit(event: string, data?: any): void;
+  on(event: string, callback: (data?: any) => void): void;
+  
+  // Stats & Debugging
+  getStats(): EngineStats;
 }
 ```
 
-#### Built-in Plugins
-- **FarmingPlugin** - Complete farming system with crops, growth, and harvesting
-
-## Examples
-
-### Complete RPG Character System
-
+#### ActionSystem
 ```typescript
-import { GameEngine, FarmingPlugin } from '@gameboilerplate/shared/engine';
-
-// Setup RPG with farming
-const engine = new GameEngine();
-await engine.init('rpg');
-
-// Install farming plugin
-await engine.installPlugin(new FarmingPlugin());
-
-// Create character
-const character = engine.createEntity('player', { x: 0, y: 0, z: 0 });
-character.properties = {
-  name: 'Hero',
-  level: 1,
-  experience: 0,
-  stats: { strength: 10, agility: 8, intelligence: 12 },
-  inventory: [
-    { type: 'wheat_seed', quantity: 5 },
-    { type: 'sword', damage: 15 }
-  ]
-};
-
-engine.addEntity(character);
-
-// Player actions
-await engine.executeAction('plantSeed', {
-  seedType: 'wheat',
-  position: { x: 2, y: 0, z: 0 }
-}, { userId: character.id, engine });
-
-await engine.executeAction('movePlayer', {
-  direction: 'east',
-  distance: 3
-}, { userId: character.id, engine });
+interface IActionSystem {
+  registerAction(definition: ActionDefinition): void;
+  unregisterAction(type: string): void;
+  processAction(type: string, data: any, context: ActionContext): Promise<ActionResult>;
+  isOnCooldown(userId: string, actionType: string): boolean;
+}
 ```
 
-### Multiplayer Battle System
+#### Built-in Systems
+
+- **EntitySystem** - Core entity management
+- **ActionSystem** - Action processing and validation
+- **NetworkSystem** - Real-time synchronization
+- **PhysicsSystem** - Basic collision detection
+- **InventorySystem** - Item management
+- **CharacterSystem** - Player progression
+- **QuestSystem** - Mission and objective tracking
+
+### Built-in Plugins
+
+#### FarmingPlugin
+Complete farming system with crops, growth mechanics, and harvesting:
 
 ```typescript
-// Server setup
-const battleEngine = new ServerGameEngine();
-await battleEngine.init('mmo');
+import { FarmingPlugin } from '@gameboilerplate/shared';
 
-// Register battle action
-battleEngine.registerAction({
-  type: 'castSpell',
-  schema: z.object({
-    spellId: z.string(),
-    targetId: z.string(),
-    position: z.object({ x: z.number(), y: z.number(), z: z.number() })
-  }),
-  cooldown: 3000,
-  handler: async (data, context) => {
-    const caster = context.engine.getEntity(context.userId);
-    const target = context.engine.getEntity(data.targetId);
-    
-    if (!caster || !target) {
-      return { success: false, message: 'Invalid targets' };
+await engine.installPlugin(new FarmingPlugin());
+
+// Plant crops
+await engine.executeAction('plantSeed', {
+  seedType: 'wheat',
+  position: { x: 5, y: 0, z: 5 }
+}, context);
+
+// Harvest mature crops
+await engine.executeAction('harvestCrop', {
+  position: { x: 5, y: 0, z: 5 }
+}, context);
+```
+
+## 🔧 Extending the Engine
+
+### Creating Custom Systems
+
+```typescript
+import { System, GameState, IGameEngine } from '@gameboilerplate/shared';
+
+class WeatherSystem implements System {
+  name = 'WeatherSystem';
+  priority = 15; // Lower numbers run first
+  enabled = true;
+  
+  private weather = {
+    temperature: 20,
+    precipitation: 0,
+    windSpeed: 5
+  };
+
+  async init(engine: IGameEngine): Promise<void> {
+    console.log('🌤️ Weather system initialized');
+    // Set up initial weather
+  }
+
+  async update(deltaTime: number, gameState: GameState): Promise<void> {
+    // Update weather every 30 seconds
+    if (gameState.totalTime % 30000 < deltaTime) {
+      this.updateWeather();
+      this.applyWeatherEffects(gameState);
     }
+  }
 
-    // Spell logic
-    const damage = calculateSpellDamage(data.spellId, caster.properties.level);
-    target.properties.health -= damage;
+  private updateWeather(): void {
+    // Gradually change weather
+    this.weather.temperature += (Math.random() - 0.5) * 2;
+    this.weather.precipitation = Math.max(0, this.weather.precipitation + (Math.random() - 0.7) * 10);
+  }
 
+  private applyWeatherEffects(gameState: GameState): void {
+    for (const entity of gameState.entities.values()) {
+      if (entity.type === 'player') {
+        // Apply temperature effects
+        if (this.weather.temperature < 0) {
+          entity.properties.statusEffects = entity.properties.statusEffects || [];
+          entity.properties.statusEffects.push('cold');
+        }
+        
+        // Apply rain effects
+        if (this.weather.precipitation > 50) {
+          entity.properties.movementSpeed *= 0.8; // Slow movement in heavy rain
+        }
+      }
+    }
+  }
+
+  async destroy(): Promise<void> {
+    console.log('🌤️ Weather system destroyed');
+  }
+}
+
+// Register the system
+engine.addSystem(new WeatherSystem());
+```
+
+### Creating Custom Actions
+
+```typescript
+import { z } from 'zod';
+
+// Define schema for type safety
+const TradeItemSchema = z.object({
+  targetPlayerId: z.string(),
+  offeredItems: z.array(z.object({
+    itemId: z.string(),
+    quantity: z.number().min(1)
+  })),
+  requestedItems: z.array(z.object({
+    itemId: z.string(),
+    quantity: z.number().min(1)
+  }))
+});
+
+// Register the action
+engine.registerAction({
+  type: 'tradeItems',
+  schema: TradeItemSchema,
+  cooldown: 5000, // 5 second cooldown between trades
+  handler: async (data, context) => {
+    const trader = context.engine.getEntity(context.userId);
+    const target = context.engine.getEntity(data.targetPlayerId);
+    
+    if (!trader || !target) {
+      return { success: false, message: 'Invalid players' };
+    }
+    
+    // Validate both players have required items
+    const traderHasItems = validateInventory(trader, data.offeredItems);
+    const targetHasItems = validateInventory(target, data.requestedItems);
+    
+    if (!traderHasItems || !targetHasItems) {
+      return { success: false, message: 'Insufficient items for trade' };
+    }
+    
+    // Execute the trade
+    removeItems(trader, data.offeredItems);
+    addItems(trader, data.requestedItems);
+    removeItems(target, data.requestedItems);
+    addItems(target, data.offeredItems);
+    
     return {
       success: true,
-      data: { damage, targetHealth: target.properties.health },
+      data: { 
+        traderInventory: trader.properties.inventory,
+        targetInventory: target.properties.inventory
+      },
       events: [{
-        type: 'spell:cast',
+        type: 'trade:completed',
         data: {
-          casterId: context.userId,
-          targetId: data.targetId,
-          spellId: data.spellId,
-          damage,
-          position: data.position
+          traderId: context.userId,
+          targetId: data.targetPlayerId,
+          offeredItems: data.offeredItems,
+          requestedItems: data.requestedItems
         },
         timestamp: Date.now()
       }]
@@ -384,27 +659,95 @@ battleEngine.registerAction({
 });
 ```
 
-## Development
+## 🧪 Testing
+
+### Unit Tests
+```bash
+npm test                    # Run all tests
+npm run test:watch         # Watch mode
+npm run test:coverage      # Coverage report
+```
+
+### Test Examples
+```typescript
+import { GameEngine, ActionSystem } from '../src';
+
+describe('GameEngine', () => {
+  let engine: GameEngine;
+
+  beforeEach(async () => {
+    engine = new GameEngine();
+    await engine.init();
+  });
+
+  afterEach(async () => {
+    await engine.stop();
+  });
+
+  test('should create and manage entities', () => {
+    const entity = engine.createEntity('player', { x: 0, y: 0, z: 0 });
+    engine.addEntity(entity);
+    
+    expect(engine.getEntity(entity.id)).toBe(entity);
+    expect(engine.getEntitiesByType('player')).toContain(entity);
+  });
+
+  test('should process actions with validation', async () => {
+    engine.registerAction({
+      type: 'testAction',
+      schema: z.object({ value: z.number() }),
+      handler: async (data) => ({ success: true, data })
+    });
+
+    const result = await engine.executeAction('testAction', { value: 42 }, {
+      userId: 'test',
+      engine
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data.value).toBe(42);
+  });
+});
+```
+
+## 🚀 Development
 
 ### Building
 ```bash
-npm run build
-```
-
-### Testing
-```bash
-npm test
+npm run build       # Build the package
+npm run build:watch # Watch mode for development
 ```
 
 ### Type Checking
 ```bash
-npm run type-check
+npm run type-check  # TypeScript type checking
 ```
 
-## Contributing
+### Linting
+```bash
+npm run lint        # ESLint
+npm run lint:fix    # Fix auto-fixable issues
+```
 
-1. Add new systems in `src/engine/systems/`
-2. Add new plugins in `src/engine/plugins/`
-3. Update types in `src/engine/types.ts`
-4. Add tests for new functionality
-5. Update documentation
+## 🔗 Integration with Other Packages
+
+The shared package is designed to integrate seamlessly with all other packages:
+
+- **[Server Package](../server/README.md)** - Uses ServerGameEngine for multiplayer logic
+- **[Client Package](../client/README.md)** - Uses GameEngine for client-side game state
+- **[Admin Package](../admin/README.md)** - Uses types and schemas for data consistency
+- **[Tests Package](../../tests/README.md)** - Tests all shared functionality
+
+## 🤝 Contributing
+
+1. **Add new systems** in `src/engine/systems/`
+2. **Add new plugins** in `src/engine/plugins/`
+3. **Update types** in `src/engine/types.ts`
+4. **Add tests** for new functionality
+5. **Update documentation** in this README
+
+See the [main README](../../README.md) for general contribution guidelines.
+
+---
+
+*This package forms the foundation of the entire GameBoilerplate ecosystem. Changes here affect all other packages, so please test thoroughly!*
