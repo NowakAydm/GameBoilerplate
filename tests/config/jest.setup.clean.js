@@ -3,8 +3,8 @@
  * Configures global variables and test environment
  */
 
-// Global fetch for Node.js environment
-global.fetch = require('node-fetch');
+// Global fetch is available in Node.js 18+ natively
+// No need to polyfill
 
 // Global test constants
 global.API_BASE = 'http://localhost:3000';

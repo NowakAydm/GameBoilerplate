@@ -1,7 +1,5 @@
-const fetch = require('node-fetch');
-
-// Mock fetch at the module level
-global.fetch = fetch;
+// Global fetch is available in Node.js 18+ natively
+// No need to polyfill
 
 describe('Charts and Analytics', () => {
   let originalFetch;

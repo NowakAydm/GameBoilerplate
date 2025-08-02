@@ -5,8 +5,8 @@
 
 // No global mock server - each test file manages its own mock server
 
-// Global fetch for Node.js environment
-global.fetch = require('node-fetch');
+// Global fetch is available in Node.js 18+ natively
+// No need to polyfill
 
 // Global test constants
 global.API_BASE = 'http://localhost:3000';  // Use actual server
@@ -94,5 +94,6 @@ global.mockFetch = (responses) => {
 
 // Restore original fetch
 global.restoreFetch = () => {
-  global.fetch = require('node-fetch');
+  // Restore to native fetch (Node.js 18+)
+  delete global.fetch;
 };

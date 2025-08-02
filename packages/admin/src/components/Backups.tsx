@@ -35,7 +35,7 @@ import {
   Delete,
   Restore,
   Schedule,
-  ManualRecord,
+  FiberManualRecord,
   Warning,
   Refresh,
   Add,
@@ -302,7 +302,7 @@ export const Backups: React.FC = () => {
                       {stats.manualBackups}
                     </Typography>
                   </Box>
-                  <ManualRecord color="warning" sx={{ fontSize: 40 }} />
+                  <FiberManualRecord color="warning" sx={{ fontSize: 40 }} />
                 </Box>
               </CardContent>
             </Card>
@@ -347,7 +347,7 @@ export const Backups: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          icon={backup.type === 'scheduled' ? <Schedule /> : <ManualRecord />}
+                          icon={backup.type === 'scheduled' ? <Schedule /> : <FiberManualRecord />}
                           label={backup.type}
                           color={backup.type === 'scheduled' ? 'primary' : 'default'}
                           size="small"

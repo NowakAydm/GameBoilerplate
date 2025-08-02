@@ -52,12 +52,6 @@ global.pending = (message) => {
 
 // Mock all possible fetch implementations
 const originalGlobalFetch = global.fetch;
-const originalNodeFetch = global.require && global.require.cache && global.require.cache['node-fetch'];
-
-// Clear any existing fetch modules from cache
-if (typeof require !== 'undefined' && require.cache) {
-  delete require.cache[require.resolve('node-fetch')];
-}
 
 // Define our comprehensive mock function
 const mockFetch = jest.fn().mockImplementation(async (url, options = {}) => {
@@ -293,19 +287,6 @@ const mockFetch = jest.fn().mockImplementation(async (url, options = {}) => {
 
 // Apply the mock to all possible fetch implementations
 global.fetch = mockFetch;
-
-// Also replace node-fetch module completely
-jest.mock('node-fetch', () => mockFetch);
-
-// Mock the require function for node-fetch
-const Module = require('module');
-const originalRequire = Module.prototype.require;
-Module.prototype.require = function(id) {
-  if (id === 'node-fetch' || id.endsWith('node-fetch')) {
-    return mockFetch;
-  }
-  return originalRequire.apply(this, arguments);
-};
 
 // Additional safeguards
 if (typeof window !== 'undefined') {

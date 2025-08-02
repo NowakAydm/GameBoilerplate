@@ -3,7 +3,7 @@
  * Configures global variables, test environment, and mock server
  */
 
-const MockServer = require('./mock-server');
+const MockServer = require('./utils/mock-server');
 
 // Mock server instance
 let mockServer = null;
@@ -21,8 +21,8 @@ afterAll(async () => {
   }
 });
 
-// Global fetch for Node.js environment
-global.fetch = require('node-fetch');
+// Global fetch is available in Node.js 18+ natively
+// No need to polyfill
 
 // Browser environment mocks for game engine tests
 global.requestAnimationFrame = (callback) => {

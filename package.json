@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "npx turbo run build",
-    "lint": "eslint . --ext .js,.ts,.tsx --ignore-path .gitignore",
+    "lint": "eslint . --ext .js,.ts,.tsx",
     "format": "prettier --write .",
     "prepare": "husky",
     "test": "npm run test --workspace=tests",

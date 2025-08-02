@@ -134,13 +134,13 @@ class MockServer {
       });
     });
 
-    // Unauthorized access (no token)
-    this.app.get('/api/admin/*', (req, res) => {
+    // Unauthorized access (no token) - catch-all for admin routes
+    this.app.use('/api/admin', (req, res) => {
       res.status(401).json({ error: 'Unauthorized access' });
     });
 
     // 404 for unknown routes
-    this.app.use('*', (req, res) => {
+    this.app.use((req, res) => {
       res.status(404).json({ error: 'Route not found' });
     });
   }

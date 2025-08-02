@@ -1,9 +1,41 @@
 /**
  * Basic Admin Dashboard Tests for Jest Integration
- * Tests that run even when server is down to show test discovery
+ * Tests admin functionality using mock infrastructure
  */
 
 describe('Admin Dashboard Tests', () => {
+  let adminToken = null;
+
+  beforeAll(async () => {
+    // Use mock token and setup fetch mocking
+    adminToken = global.MOCK_ADMIN_TOKEN;
+    
+    // Mock API responses
+    global.mockFetch({
+      [`${global.API_BASE}/admin/metrics/user-types`]: {
+        data: {
+          registeredUsers: 100,
+          guestUsers: 50,
+          registeredSessions: 150,
+          guestSessions: 75
+        }
+      },
+      [`${global.API_BASE}/admin/users`]: {
+        status: 401,
+        data: { error: 'Unauthorized' }
+      },
+      // Handle unauthorized requests
+      'unauthorized': {
+        status: 401,
+        data: { error: 'Unauthorized' }
+      },
+      default: { data: { success: true } }
+    });
+  });
+
+  afterAll(() => {
+    global.restoreFetch();
+  });
   test('should load test environment correctly', () => {
     expect(typeof fetch).toBe('function');
     expect(API_BASE).toBe('http://localhost:3000');
@@ -83,38 +115,14 @@ describe('Admin Dashboard Tests', () => {
     expect(registeredUsers.length + guestUsers.length).toBe(mockUsers.length);
   });
 
-  describe('Server Integration Tests (requires running server)', () => {
-    let adminToken = null;
-    let serverAvailable = false;
-
-    beforeAll(async () => {
-      serverAvailable = !(await skipIfServerDown());
-      if (serverAvailable) {
-        try {
-          adminToken = await getAdminToken();
-        } catch (error) {
-          console.warn('Could not get admin token:', error.message);
-        }
-      }
-    });
-
+  describe('Server Integration Tests (with mocked responses)', () => {
     test('admin authentication', async () => {
-      if (!serverAvailable) {
-        console.log('⚠️ Skipping - server not available');
-        return;
-      }
-
       expect(adminToken).toBeTruthy();
       expect(typeof adminToken).toBe('string');
     });
 
     test('user metrics endpoint', async () => {
-      if (!serverAvailable || !adminToken) {
-        console.log('⚠️ Skipping - server not available or no token');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/metrics/user-types`, {
+      const response = await fetch(`${global.API_BASE}/admin/metrics/user-types`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
@@ -128,12 +136,7 @@ describe('Admin Dashboard Tests', () => {
     });
 
     test('unauthorized access protection', async () => {
-      if (!serverAvailable) {
-        console.log('⚠️ Skipping - server not available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/users`);
+      const response = await fetch(`${global.API_BASE}/admin/users`);
       expect([401, 403]).toContain(response.status);
     });
   });

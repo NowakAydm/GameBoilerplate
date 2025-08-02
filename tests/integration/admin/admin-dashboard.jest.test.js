@@ -89,24 +89,12 @@ describe('Admin Dashboard Integration Tests', () => {
 
   describe('Authentication', () => {
     test('should authenticate admin user successfully', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        test.skip('Server not available');
-        return;
-      }
-
       expect(adminToken).toBeTruthy();
       expect(typeof adminToken).toBe('string');
     });
 
     test('should reject invalid credentials', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/auth/login`, {
+      const response = await fetch(`${global.API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,18 +110,7 @@ describe('Admin Dashboard Integration Tests', () => {
 
   describe('Admin Dashboard Data', () => {
     test('should fetch user metrics successfully', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      if (!adminToken) {
-        pending('No admin token available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/metrics/user-types`, {
+      const response = await fetch(`${global.API_BASE}/admin/metrics/user-types`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
@@ -161,18 +138,7 @@ describe('Admin Dashboard Integration Tests', () => {
     });
 
     test('should fetch user list successfully', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      if (!adminToken) {
-        pending('No admin token available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/users`, {
+      const response = await fetch(`${global.API_BASE}/admin/users`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
@@ -197,18 +163,7 @@ describe('Admin Dashboard Integration Tests', () => {
     });
 
     test('should calculate user type percentages correctly', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      if (!adminToken) {
-        pending('No admin token available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/metrics/user-types`, {
+      const response = await fetch(`${global.API_BASE}/admin/metrics/user-types`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
@@ -232,25 +187,14 @@ describe('Admin Dashboard Integration Tests', () => {
 
   describe('Data Consistency', () => {
     test('should maintain consistency across different endpoints', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      if (!adminToken) {
-        pending('No admin token available');
-        return;
-      }
-
       const [usersResponse, metricsResponse, userTypesResponse] = await Promise.all([
-        fetch(`${API_BASE}/admin/users`, {
+        fetch(`${global.API_BASE}/admin/users`, {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         }),
-        fetch(`${API_BASE}/admin/metrics`, {
+        fetch(`${global.API_BASE}/admin/metrics`, {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         }),
-        fetch(`${API_BASE}/admin/metrics/user-types`, {
+        fetch(`${global.API_BASE}/admin/metrics/user-types`, {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         })
       ]);
@@ -275,12 +219,6 @@ describe('Admin Dashboard Integration Tests', () => {
 
   describe('Authorization', () => {
     test('should block unauthorized access to admin endpoints', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
       const endpoints = [
         '/admin/users',
         '/admin/metrics',
@@ -288,19 +226,13 @@ describe('Admin Dashboard Integration Tests', () => {
       ];
 
       for (const endpoint of endpoints) {
-        const response = await fetch(`${API_BASE}${endpoint}`);
+        const response = await fetch(`${global.API_BASE}${endpoint}`);
         expect([401, 403]).toContain(response.status);
       }
     });
 
     test('should block access with invalid tokens', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/admin/users`, {
+      const response = await fetch(`${global.API_BASE}/admin/users`, {
         headers: { 'Authorization': 'Bearer invalid-token' }
       });
 
@@ -310,20 +242,9 @@ describe('Admin Dashboard Integration Tests', () => {
 
   describe('Performance', () => {
     test('should respond within reasonable time limits', async () => {
-      const serverDown = await skipIfServerDown();
-      if (serverDown) {
-        pending('Server not available');
-        return;
-      }
-
-      if (!adminToken) {
-        pending('No admin token available');
-        return;
-      }
-
       const startTime = Date.now();
       
-      const response = await fetch(`${API_BASE}/admin/metrics/user-types`, {
+      const response = await fetch(`${global.API_BASE}/admin/metrics/user-types`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
