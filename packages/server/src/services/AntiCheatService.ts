@@ -38,6 +38,29 @@ export class AntiCheatService {
     this.gameStates.set(userId, initialState);
     return initialState;
   }
+  
+  /**
+   * Get all game states for persistence
+   */
+  static getAllGameStates(): { entities: Record<string, any> } {
+    const entities: Record<string, any> = {};
+    
+    this.gameStates.forEach((state, userId) => {
+      entities[userId] = {
+        type: 'player',
+        position: state.position,
+        properties: {
+          health: state.health,
+          level: state.level,
+          experience: state.experience,
+          gold: state.gold,
+          inventory: state.inventory,
+        }
+      };
+    });
+    
+    return { entities };
+  }
 
   /**
    * Get user's current game state

@@ -17,12 +17,41 @@ export type ExampleSharedType = {
 export const UserRoleSchema = z.enum(['guest', 'registered', 'admin']);
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
+// Game data related schemas
+export const PositionSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  z: z.number(),
+});
+
+export type Position = z.infer<typeof PositionSchema>;
+
+export const GameItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string(),
+  // Additional properties can be any type
+}).passthrough();
+
+export type GameItem = z.infer<typeof GameItemSchema>;
+
+export const GameDataSchema = z.object({
+  level: z.number().default(1),
+  experience: z.number().default(0),
+  inventory: z.array(GameItemSchema).default([]),
+  position: PositionSchema.default({ x: 0, y: 0, z: 0 }),
+  lastUpdated: z.date().optional(),
+});
+
+export type GameData = z.infer<typeof GameDataSchema>;
+
 export const UserSchema = z.object({
   id: z.string(),
   username: z.string().optional(),
   email: z.string().email().optional(),
   role: UserRoleSchema,
   isGuest: z.boolean(),
+  gameData: GameDataSchema.optional(),
   createdAt: z.date(),
   lastLogin: z.date().optional(),
 });

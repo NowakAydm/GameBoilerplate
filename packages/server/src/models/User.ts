@@ -7,6 +7,17 @@ export interface IUser extends Document {
   passwordHash?: string;
   role: UserRole;
   isGuest: boolean;
+  gameData?: {
+    level: number;
+    experience: number;
+    inventory: any[];
+    position: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    lastUpdated?: Date;
+  };
   createdAt: Date;
   lastLogin?: Date;
 }
@@ -37,6 +48,16 @@ const UserSchema = new Schema<IUser>(
       type: Boolean,
       default: true,
     },
+    gameData: {
+      type: Object,
+      default: () => ({
+        level: 1,
+        experience: 0,
+        inventory: [],
+        position: { x: 0, y: 0, z: 0 },
+        lastUpdated: new Date()
+      })
+    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -64,6 +85,16 @@ const mockUsers: Array<Partial<IUser> & { _id: string; passwordHash?: string }> 
     passwordHash: '$2b$10$dummyhashforadminuser123456789', // In mock mode, any hash works
     role: 'admin',
     isGuest: false,
+    gameData: {
+      level: 10,
+      experience: 5000,
+      inventory: [
+        { id: 'item-1', name: 'Admin Sword', type: 'weapon', power: 100 },
+        { id: 'item-2', name: 'Admin Shield', type: 'armor', defense: 100 }
+      ],
+      position: { x: 10, y: 0, z: 10 },
+      lastUpdated: new Date()
+    },
     createdAt: new Date(),
     lastLogin: new Date(),
   },
@@ -74,6 +105,16 @@ const mockUsers: Array<Partial<IUser> & { _id: string; passwordHash?: string }> 
     passwordHash: '$2b$10$dummyhashfortestuser123456789',
     role: 'registered',
     isGuest: false,
+    gameData: {
+      level: 5,
+      experience: 2500,
+      inventory: [
+        { id: 'item-3', name: 'Bronze Sword', type: 'weapon', power: 15 },
+        { id: 'item-4', name: 'Health Potion', type: 'consumable', health: 50, quantity: 3 }
+      ],
+      position: { x: 5, y: 0, z: 5 },
+      lastUpdated: new Date()
+    },
     createdAt: new Date(),
     lastLogin: new Date(),
   },
@@ -83,6 +124,13 @@ const mockUsers: Array<Partial<IUser> & { _id: string; passwordHash?: string }> 
     email: undefined,
     role: 'guest',
     isGuest: true,
+    gameData: {
+      level: 1,
+      experience: 0,
+      inventory: [],
+      position: { x: 0, y: 0, z: 0 },
+      lastUpdated: new Date()
+    },
     createdAt: new Date(),
   },
 ];

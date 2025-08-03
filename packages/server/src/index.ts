@@ -16,6 +16,8 @@ import { AuthUtils } from './utils/auth';
 import { AntiCheatService } from './services/AntiCheatService';
 import { metricsTracker } from './services/MetricsService';
 import { backupService } from './services/BackupService';
+import { gameDataService } from './services/GameDataService';
+import { persistenceSystem } from './engine/PersistenceSystem';
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from './middleware/auth';
@@ -91,7 +93,7 @@ io.use((socket, next) => {
   next();
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   const user: JWTPayload = (socket as any).user;
   console.log('User connected:', { userId: user.userId, role: user.role, isGuest: user.isGuest });
 
@@ -108,6 +110,9 @@ io.on('connection', (socket) => {
 
   // Initialize user's game state
   AntiCheatService.initializeUserState(user.userId);
+  
+  // Initialize player game data
+  await gameDataService.initializePlayer(user.userId);
 
   socket.on('gameAction', (action) => {
     // Sanitize and validate input using shared schema
@@ -205,12 +210,13 @@ setInterval(
   5 * 60 * 1000,
 );
 
-// Cleanup inactive game states every 5 minutes
+// Run persistence system every minute to save game data
 setInterval(
   () => {
-    AntiCheatService.cleanupInactiveStates();
+    const gameState = AntiCheatService.getAllGameStates();
+    persistenceSystem.update(60000, gameState);
   },
-  5 * 60 * 1000,
+  60 * 1000
 );
 
 // Start server

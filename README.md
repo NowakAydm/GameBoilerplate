@@ -12,6 +12,7 @@
 - [🌐 Deployment on Render.com](#-deployment-on-rendercom)
 - [📊 Admin Dashboard & Real-time Analytics](#-admin-dashboard--real-time-analytics)
 - [🔄 Game State Management](#-game-state-management)
+  - [Game Data Management](#game-data-management)
 - [🎮 Action Processing Flow](#-action-processing-flow)
 - [🧪 Testing](#-testing)
 - [🛠️ Development Tools](#️-development-tools)
@@ -33,6 +34,7 @@
 | [🗺️ Project Roadmap](./docs/ROADMAP.md) | Detailed development roadmap |
 | [📖 Context Documentation](./docs/CONTEXT.md) | Project context and background |
 | [🔧 MongoDB Setup](./docs/MONGODB_SETUP.md) | Database configuration guide |
+| [💾 Game Data Management](./docs/GAME_DATA.md) | User game data persistence features |
 
 ---
 
@@ -43,6 +45,7 @@ This boilerplate provides everything you need to build modern multiplayer games:
 - **🎮 Complete Game Engine**: ECS architecture with pluggable systems
 - **🌐 Real-time Multiplayer**: WebSocket-based synchronization
 - **📦 Shared State Management**: Centralized game logic across client/server/admin
+- **💾 Game Data Persistence**: Player inventory, stats, and position persistence between sessions
 - **🎨 3D Visualization**: React Three Fiber integration
 - **🛡️ Type Safety**: End-to-end TypeScript with Zod validation
 - **🔌 Plugin System**: Extensible game mechanics
@@ -73,6 +76,7 @@ flowchart TD
         S2["Socket.io Server<br/>Real-time Sync"]
         S3["Metrics Service<br/>Analytics Engine"]
         S4["Anti-cheat<br/>Game Logic"]
+        S5["UserService<br/>Game Data Management"]
     end
     
     subgraph "⚡ Shared Package"
@@ -93,6 +97,7 @@ flowchart TD
     
     %% Admin connections  
     A1 <==> S1
+    A1 <==> S5
     A2 <==> S3
     A3 <==> S3
     
@@ -105,6 +110,7 @@ flowchart TD
     %% Data persistence
     S1 --> DB
     S4 --> DB
+    S5 --> DB
     
     %% Shared dependencies
     SH3 --> C1
@@ -121,7 +127,7 @@ flowchart TD
     
     class C1,C2,C3 clientStyle
     class A1,A2,A3 adminStyle
-    class S1,S2,S3,S4 serverStyle
+    class S1,S2,S3,S4,S5 serverStyle
     class SH1,SH2,SH3 sharedStyle
     class DB,CACHE dataStyle
 ```
@@ -188,7 +194,8 @@ The admin package provides comprehensive server monitoring and management with *
 | **📊 Analytics Charts** | Player trends, activity patterns | `/admin/metrics/charts` → Real-time data | Live updates |
 | **👥 User Management** | Active sessions, playtime tracking | `/admin/users` → UserSession tracking | Every 10 seconds |
 | **🎮 Game States** | Active players, positions, actions | `/admin/game-states` → AntiCheatService | Real-time |
-| **📋 System Logs** | Server events, auth, errors | `/admin/logs` → System logging | Every 5 seconds |
+| **� Game Data** | Player inventory, stats, position management | `/admin/game-data` → UserService | On-demand |
+| **�📋 System Logs** | Server events, auth, errors | `/admin/logs` → System logging | Every 5 seconds |
 | **⚡ Performance** | Response times, server metrics | `/admin/metrics/*` → Live monitoring | Continuous |
 
 ### 🔗 Available Admin API Endpoints
@@ -290,6 +297,58 @@ sequenceDiagram
         S-->>C: Real-time Updates
     end
 ```
+
+### Game Data Management
+
+The `UserService` has been enhanced with game data persistence capabilities, allowing player data to be stored and retrieved between sessions:
+
+```mermaid
+flowchart TD
+    subgraph "🎮 Game Data Flow"
+        C[Client] -->|Send Game Action| S[Server]
+        S -->|Update State| GD[Game Data]
+        S -->|Persist| DB[(MongoDB)]
+        
+        GDS[GameDataService] -->|High-level API| US[UserService]
+        US -->|CRUD Operations| DB
+        
+        PS[PersistenceSystem] -->|Auto-save| DB
+    end
+    
+    classDef primary fill:#e8f4fd,stroke:#1976d2,stroke-width:2px,color:#000000
+    class C,S,GD,GDS,US,PS,DB primary
+```
+
+#### UserService Game Data Methods
+
+| Category | Methods | Description |
+|----------|---------|-------------|
+| **Basic** | `getUserGameData`, `updateUserGameData` | Core data retrieval and updates |
+| **Position** | `updatePlayerPosition` | Update player world coordinates |
+| **Stats** | `updatePlayerStats` | Manage level and experience |
+| **Inventory** | `addToInventory`, `removeFromInventory` | Item management |
+| **User Management** | `createGuestUser`, `upgradeGuestToRegistered` | User accounts with game data |
+
+#### GameDataService Layer
+
+A higher-level abstraction for common game operations:
+
+```typescript
+// Award experience and handle level-ups
+const didLevelUp = await gameDataService.awardExperience(userId, 100);
+
+// Manage player inventory
+await gameDataService.giveItem(userId, {
+  id: 'sword-123',
+  name: 'Excalibur',
+  type: 'weapon'
+});
+
+// Retrieve complete player data
+const playerData = await gameDataService.getPlayerData(userId);
+```
+
+For complete documentation, see [Game Data Management](./docs/GAME_DATA.md).
 
 ### Shared Components from `packages/shared`
 
