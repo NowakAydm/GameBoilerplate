@@ -3,6 +3,8 @@ import { AuthUtils } from '../utils/auth';
 import { AuthRequest, User, UserRole } from '@gameboilerplate/shared';
 import { Types } from 'mongoose';
 
+import { UserService } from './UserService';
+
 const isMockMode = () => process.env.MOCK_MODE === 'true';
 
 export class AuthService {
@@ -68,33 +70,6 @@ export class AuthService {
       throw new Error('Username, email, and password are required for registration');
     }
 
-    // Check if user already exists
-    const existingUser = await UserModel.findOne({
-      $or: [{ email }, { username }],
-      isGuest: false,
-    });
-
-    if (existingUser) {
-      if (existingUser.email === email) {
-        throw new Error('Email already registered');
-      }
-      if (existingUser.username === username) {
-        throw new Error('Username already taken');
-      }
-    }
-
-    // Hash password
-    const passwordHash = await AuthUtils.hashPassword(password);
-
-    const userData = {
-      username,
-      email,
-      passwordHash,
-      role: 'registered' as UserRole,
-      isGuest: false,
-      lastLogin: new Date(),
-    };
-
     if (isMockMode()) {
       const user: User = {
         id: `user_${Date.now()}`,
@@ -114,12 +89,11 @@ export class AuthService {
 
       return { user, token };
     }
-
-    const userDoc = new UserModel(userData);
-    await userDoc.save();
-
+    // Use UserService for registration
+    const userService = new UserService();
+    const userDoc = await userService.registerUser(username, email, password);
     const user: User = {
-      id: (userDoc._id as Types.ObjectId).toString(),
+      id: userDoc._id.toString(),
       username: userDoc.username,
       email: userDoc.email,
       role: userDoc.role,
@@ -127,13 +101,11 @@ export class AuthService {
       createdAt: userDoc.createdAt,
       lastLogin: userDoc.lastLogin,
     };
-
     const token = AuthUtils.generateToken({
       userId: user.id,
       role: user.role,
       isGuest: user.isGuest,
     });
-
     return { user, token };
   }
 
@@ -183,25 +155,14 @@ export class AuthService {
         throw new Error('Invalid email or password');
       }
     }
-
-    const userDoc = await UserModel.findOne({ email, isGuest: false });
-
-    if (!userDoc || !userDoc.passwordHash) {
+    // Use UserService for authentication
+    const userService = new UserService();
+    const userDoc = await userService.authenticateUser(email, password);
+    if (!userDoc) {
       throw new Error('Invalid email or password');
     }
-
-    const isPasswordValid = await AuthUtils.verifyPassword(password, userDoc.passwordHash);
-
-    if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
-    }
-
-    // Update last login
-    userDoc.lastLogin = new Date();
-    await userDoc.save();
-
     const user: User = {
-      id: (userDoc._id as Types.ObjectId).toString(),
+      id: userDoc._id.toString(),
       username: userDoc.username,
       email: userDoc.email,
       role: userDoc.role,
@@ -209,13 +170,11 @@ export class AuthService {
       createdAt: userDoc.createdAt,
       lastLogin: userDoc.lastLogin,
     };
-
     const token = AuthUtils.generateToken({
       userId: user.id,
       role: user.role,
       isGuest: user.isGuest,
     });
-
     return { user, token };
   }
 
@@ -239,45 +198,18 @@ export class AuthService {
         createdAt: new Date(),
         lastLogin: new Date(),
       };
-
       const token = AuthUtils.generateToken({
         userId: user.id,
         role: user.role,
         isGuest: user.isGuest,
       });
-
       return { user, token };
     }
-
-    const userDoc = await UserModel.findById(userId);
-
-    if (!userDoc || !userDoc.isGuest) {
-      throw new Error('User not found or not a guest');
-    }
-
-    // Check if email/username already taken
-    const existingUser = await UserModel.findOne({
-      _id: { $ne: userId },
-      $or: [{ email }, { username }],
-    });
-
-    if (existingUser) {
-      throw new Error('Email or username already taken');
-    }
-
-    const passwordHash = await AuthUtils.hashPassword(password);
-
-    userDoc.username = username;
-    userDoc.email = email;
-    userDoc.passwordHash = passwordHash;
-    userDoc.role = 'registered';
-    userDoc.isGuest = false;
-    userDoc.lastLogin = new Date();
-
-    await userDoc.save();
-
+    // Use UserService for upgrade
+    const userService = new (await import('./UserService')).UserService();
+    const userDoc = await userService.upgradeGuestToRegistered(userId, username, email, password);
     const user: User = {
-      id: (userDoc._id as Types.ObjectId).toString(),
+      id: userDoc._id.toString(),
       username: userDoc.username,
       email: userDoc.email,
       role: userDoc.role,
@@ -285,13 +217,11 @@ export class AuthService {
       createdAt: userDoc.createdAt,
       lastLogin: userDoc.lastLogin,
     };
-
     const token = AuthUtils.generateToken({
       userId: user.id,
       role: user.role,
       isGuest: user.isGuest,
     });
-
     return { user, token };
   }
 
@@ -364,15 +294,12 @@ export class AuthService {
       }
       return null;
     }
-
-    const userDoc = await UserModel.findById(userId);
-
-    if (!userDoc) {
-      return null;
-    }
-
+    // Use UserService for user lookup
+    const userService = new UserService();
+    const userDoc = await userService.getUserById(userId);
+    if (!userDoc) return null;
     return {
-      id: (userDoc._id as Types.ObjectId).toString(),
+      id: userDoc._id.toString(),
       username: userDoc.username,
       email: userDoc.email,
       role: userDoc.role,

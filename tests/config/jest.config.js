@@ -32,5 +32,15 @@ module.exports = {
   },
   testTimeout: 30000,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  verbose: true
+  verbose: true,
+  moduleNameMapper: {
+    '^@gameboilerplate/server/(.*)$': '<rootDir>/../../packages/server/src/$1',
+    '^@gameboilerplate/shared/(.*)$': '<rootDir>/../../packages/shared/src/$1',
+    '^@gameboilerplate/client/(.*)$': '<rootDir>/../../packages/client/src/$1',
+    '^@gameboilerplate/admin/(.*)$': '<rootDir>/../../packages/admin/src/$1',
+    '^@gameboilerplate/server$': '<rootDir>/../../packages/server/src',
+    '^@gameboilerplate/shared$': '<rootDir>/../../packages/shared/src',
+    '^@gameboilerplate/client$': '<rootDir>/../../packages/client/src',
+    '^@gameboilerplate/admin$': '<rootDir>/../../packages/admin/src'
+  }
 };

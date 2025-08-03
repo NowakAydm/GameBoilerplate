@@ -1178,8 +1178,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+
 ## 🎯 Roadmap
 
+- [x] **Hybrid Backend Approach**  
+  Launch the first game with a unified backend, but abstract user management and game logic for future separation.
+- [ ] **User Service Abstraction**  
+  Implement a user service layer in the server package to handle all authentication, registration, and user profile logic. All user-related operations should go through this service.
+- [ ] **Decouple Game Logic from User Logic**  
+  Ensure game logic references users only via the user service, not directly via database models. Keep game state and user state separate in code.
+- [ ] **API Boundary Planning**  
+  Clearly document and implement API route boundaries (e.g., `/api/auth/*`, `/api/user/*`, `/api/game/*`) to prepare for future backend split.
+- [ ] **First Game Launch**  
+  Focus on shipping the first game using the current monorepo and unified backend.
+- [ ] **Backend Split (Post-Launch)**  
+  After the first game is live, migrate the user service to a dedicated backend and update game servers to communicate with it via API.
 - [ ] **Enhanced Plugin System** - Hot-reloading plugins
 - [ ] **Visual Editor** - Web-based game editor
 - [ ] **Advanced Networking** - P2P capabilities

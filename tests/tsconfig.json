@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["jest", "node"],
+    "baseUrl": "../",
+    "paths": {
+      "@gameboilerplate/shared": ["packages/shared/src"],
+      "@gameboilerplate/server/*": ["packages/server/src/*"]
+    }
+  },
+  "include": [
+    "unit/**/*.ts",
+    "integration/**/*.ts",
+    "e2e/**/*.ts"
+  ]
+}
