@@ -10,6 +10,7 @@ import {
   GameEvent,
   ExampleSharedType,
   JWTPayload,
+  GameState,
 } from '@gameboilerplate/shared';
 import { DatabaseConnection } from './utils/database';
 import { AuthUtils } from './utils/auth';
@@ -213,7 +214,15 @@ setInterval(
 // Run persistence system every minute to save game data
 setInterval(
   () => {
-    const gameState = AntiCheatService.getAllGameStates();
+    const gameStateData = AntiCheatService.getAllGameStates();
+    const gameState: GameState = {
+      entities: new Map(Object.entries(gameStateData.entities)),
+      systems: new Map(),
+      deltaTime: 60000,
+      totalTime: Date.now(),
+      gameMode: 'default',
+      settings: {}
+    };
     persistenceSystem.update(60000, gameState);
   },
   60 * 1000

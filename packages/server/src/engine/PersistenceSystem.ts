@@ -1,6 +1,5 @@
 import { UserService } from '../services/UserService';
-import type { GameState } from '@gameboilerplate/shared';
-import type { System } from '@gameboilerplate/shared/engine';
+import type { System, GameState } from '@gameboilerplate/shared';
 
 /**
  * PersistenceSystem handles saving player game data to the database
