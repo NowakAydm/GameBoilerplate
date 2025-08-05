@@ -387,131 +387,38 @@ class PersistenceSystem implements System {
 
 ## 🔌 REST API Routes
 
-### Authentication Routes
 
-```typescript
-// src/routes/auth.ts
-import express from 'express';
-import { AuthService } from '../services/AuthService';
-import { AuthRequestSchema } from '@gameboilerplate/shared';
+### API Route Boundaries
 
-const router = express.Router();
+All REST endpoints are now organized under `/api/*` boundaries for clear separation and future scalability. Example boundaries:
 
-// Guest login
-router.post('/guest', async (req, res) => {
-  try {
-    const guestUser = await AuthService.createGuestUser();
-    const token = AuthService.generateToken(guestUser);
-    
-    res.json({
-      token,
-      user: {
-        id: guestUser.id,
-        role: guestUser.role,
-        isGuest: true
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create guest user' });
-  }
-});
+- `/api/auth/*` – Authentication (guest, register, login, upgrade, me)
+- `/api/user/*` – User profile, game data, stats, inventory
+- `/api/game/*` – Game state, actions, leaderboard, inventory
+- `/api/admin/*` – Admin stats, users, logs, metrics, backups
 
-// User registration
-router.post('/register', async (req, res) => {
-  try {
-    const validationResult = AuthRequestSchema.safeParse(req.body);
-    if (!validationResult.success) {
-      return res.status(400).json({ 
-        error: 'Invalid request data',
-        details: validationResult.error.issues 
-      });
-    }
-
-    const user = await AuthService.registerUser(validationResult.data);
-    const token = AuthService.generateToken(user);
-    
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        isGuest: false
-      }
-    });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-export default router;
+#### Example: Auth Endpoints
+```http
+POST /api/auth/guest         # Create guest account
+POST /api/auth/register      # Register new user
+POST /api/auth/login         # User login
+POST /api/auth/upgrade       # Upgrade guest to registered
+GET  /api/auth/me            # Get current user info
 ```
 
-### Admin Routes
-
-```typescript
-// src/routes/admin.ts
-import express from 'express';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
-
-const router = express.Router();
-
-// Get server statistics
-router.get('/stats', authenticateToken, requireAdmin, async (req, res) => {
-  try {
-    const stats = {
-      players: {
-        online: io.sockets.sockets.size,
-        total: await UserModel.countDocuments(),
-        guests: await UserModel.countDocuments({ isGuest: true })
-      },
-      gameEngine: serverGameEngine.getStats(),
-      server: {
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        version: process.env.npm_package_version
-      }
-    };
-    
-    res.json(stats);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch statistics' });
-  }
-});
-
-// Get all users with pagination
-router.get('/users', authenticateToken, requireAdmin, async (req, res) => {
-  try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const skip = (page - 1) * limit;
-
-    const users = await UserModel
-      .find()
-      .select('-passwordHash')
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
-
-    const total = await UserModel.countDocuments();
-
-    res.json({
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
-
-export default router;
+#### Example: Admin Endpoints
+```http
+GET  /api/admin/stats        # Server statistics
+GET  /api/admin/users        # User management
+GET  /api/admin/game-states  # Active game states
+GET  /api/admin/metrics      # System metrics
+GET  /api/admin/logs         # System logs
+GET  /api/admin/actions      # Recent actions
+POST /api/admin/backup       # Create backup
+GET  /api/admin/backups      # List backups
 ```
+
+All endpoints require JWT authentication unless otherwise noted. Admin endpoints require admin role.
 
 ## 📊 Metrics & Monitoring
 

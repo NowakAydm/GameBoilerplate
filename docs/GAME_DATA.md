@@ -217,7 +217,7 @@ socket.on('gameAction', async (action) => {
 The UserService can be used in admin routes to manage player data:
 
 ```typescript
-router.post('/admin/reset-player/:userId', authenticateAdmin, async (req, res) => {
+router.post('/api/admin/reset-player/:userId', authenticateAdmin, async (req, res) => {
   const userId = req.params.userId;
   
   await userService.updateUserGameData(userId, {

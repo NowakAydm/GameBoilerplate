@@ -10,6 +10,7 @@ import {
   GameEvent,
   ExampleSharedType,
   JWTPayload,
+  GameState,
 } from '@gameboilerplate/shared';
 import { DatabaseConnection } from './utils/database';
 import { AuthUtils } from './utils/auth';
@@ -18,6 +19,11 @@ import { metricsTracker } from './services/MetricsService';
 import { backupService } from './services/BackupService';
 import { gameDataService } from './services/GameDataService';
 import { persistenceSystem } from './engine/PersistenceSystem';
+
+// API Routes
+import apiRoutes from './routes/api';
+
+// Legacy routes (for backward compatibility)
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import { authenticateToken } from './middleware/auth';
@@ -48,7 +54,16 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// =================
+// API ROUTES (NEW)
+// =================
+// Mount all new API routes under /api prefix
+app.use('/api', apiRoutes);
+
+// =========================
+// LEGACY ROUTES (BACKWARD COMPATIBILITY)
+// =========================
+// Keep existing routes for backward compatibility
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
@@ -61,6 +76,15 @@ app.get('/', (_req, res) => {
       authentication: true,
       antiCheat: true,
       websockets: true,
+      apiV1: true,
+    },
+    endpoints: {
+      'API v1': '/api/* (recommended)',
+      'Legacy Auth': '/auth/*',
+      'Legacy Admin': '/admin/*',
+      'API Documentation': '/api/docs',
+      'API Health': '/api/health',
+      'Server Health': '/health',
     },
   });
 });
@@ -213,7 +237,25 @@ setInterval(
 // Run persistence system every minute to save game data
 setInterval(
   () => {
-    const gameState = AntiCheatService.getAllGameStates();
+    const gameStateData = AntiCheatService.getAllGameStates();
+    
+    // Create proper GameState structure for persistence system
+    const gameState = {
+      entities: new Map(),
+      systems: new Map(),
+      deltaTime: 60000,
+      totalTime: Date.now(),
+      gameMode: 'default',
+      settings: {}
+    };
+    
+    // Convert entities from object to Map format
+    if (gameStateData.entities) {
+      for (const [id, entity] of Object.entries(gameStateData.entities)) {
+        gameState.entities.set(id, entity);
+      }
+    }
+    
     persistenceSystem.update(60000, gameState);
   },
   60 * 1000

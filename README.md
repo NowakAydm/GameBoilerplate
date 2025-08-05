@@ -26,12 +26,6 @@
 
 | Document | Description |
 |----------|-------------|
-| [📋 Phase 1 README](./docs/PHASE1_README.md) | Initial setup and basic architecture |
-| [📋 Phase 2 README](./docs/PHASE2_README.md) | Server implementation and API |
-| [📋 Phase 3 README](./docs/PHASE3_README.md) | Client development and 3D integration |
-| [📋 Phase 4 README](./docs/PHASE4_README.md) | Admin dashboard and real-time analytics |
-| [📋 Phase 5 README](./docs/PHASE5_README.md) | Advanced features and optimization |
-| [🗺️ Project Roadmap](./docs/ROADMAP.md) | Detailed development roadmap |
 | [📖 Context Documentation](./docs/CONTEXT.md) | Project context and background |
 | [🔧 MongoDB Setup](./docs/MONGODB_SETUP.md) | Database configuration guide |
 | [💾 Game Data Management](./docs/GAME_DATA.md) | User game data persistence features |
@@ -503,10 +497,66 @@ cd packages/client && npm run dev
 cd packages/admin && npm run dev
 ```
 
+
 ### 3. Access Applications
 - **Client Game**: [http://localhost:5173](http://localhost:5173)
 - **Admin Dashboard**: [http://localhost:5174](http://localhost:5174) *(responsive design, works on mobile)*
 - **Server API**: [http://localhost:3000](http://localhost:3000)
+  - All REST endpoints are now organized under `/api/*` boundaries for clear separation and future scalability.
+
+---
+
+## 🛡️ API Structure & Endpoints
+
+The backend API is organized into clear boundaries for authentication, user, game, and admin functionality. All endpoints are prefixed with `/api/`.
+
+| Boundary         | Example Endpoint                | Description                                 |
+|------------------|----------------------------------|---------------------------------------------|
+| **Auth**         | `/api/auth/login`               | User login, registration, guest, upgrade     |
+| **User**         | `/api/user/profile`             | User profile, game data, stats, inventory    |
+| **Game**         | `/api/game/state`               | Game state, actions, leaderboard, inventory  |
+| **Admin**        | `/api/admin/stats`              | Admin stats, users, logs, metrics, backups   |
+
+### Example Endpoints
+
+#### Auth
+- `POST /api/auth/guest` – Create guest account
+- `POST /api/auth/register` – Register new user
+- `POST /api/auth/login` – User login
+- `POST /api/auth/upgrade` – Upgrade guest to registered
+- `GET /api/auth/me` – Get current user info
+
+#### User
+- `GET /api/user/profile` – Get user profile
+- `PUT /api/user/profile` – Update user profile
+- `GET /api/user/game-data` – Get user's game data
+- `PUT /api/user/game-data` – Update game data
+- `PUT /api/user/position` – Update player position
+- `PUT /api/user/stats` – Update player stats
+- `POST /api/user/inventory/add` – Add inventory item
+- `DELETE /api/user/inventory/:itemId` – Remove inventory item
+- `GET /api/user/sessions` – Get user sessions
+
+#### Game
+- `GET /api/game/state` – Get current game state
+- `POST /api/game/action` – Process game actions
+- `GET /api/game/leaderboard` – Get leaderboards
+- `GET /api/game/inventory` – Get player inventory
+- `GET /api/game/inventory/:userId` – Get specific user inventory (admin)
+- `POST /api/game/initialize` – Initialize new player
+- `GET /api/game/stats` – Get game statistics
+
+#### Admin
+- `GET /api/admin/stats` – Server statistics
+- `GET /api/admin/users` – User management
+- `GET /api/admin/game-states` – Active game states
+- `GET /api/admin/metrics` – System metrics
+- `GET /api/admin/logs` – System logs
+- `GET /api/admin/actions` – Recent actions
+- `POST /api/admin/backup` – Create backup
+- `GET /api/admin/backups` – List backups
+
+All endpoints require JWT authentication unless otherwise noted. Admin endpoints require admin role.
 
 ---
 
@@ -1242,7 +1292,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [x] **Hybrid Backend Approach**  
   Launch the first game with a unified backend, but abstract user management and game logic for future separation.
-- [ ] **User Service Abstraction**  
+- [x] **User Service Abstraction**  
   Implement a user service layer in the server package to handle all authentication, registration, and user profile logic. All user-related operations should go through this service.
 - [ ] **Decouple Game Logic from User Logic**  
   Ensure game logic references users only via the user service, not directly via database models. Keep game state and user state separate in code.

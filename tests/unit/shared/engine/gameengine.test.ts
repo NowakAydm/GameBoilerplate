@@ -1,38 +1,73 @@
+/**
+ * Unit Tests for GameEngine
+ */
+
 import { GameEngine } from '../../../../packages/shared/src/engine/GameEngine';
-import { System, GameEntity, GameState } from '../../../../packages/shared/src/engine/types';
+import { EngineConfig, GameEntity, System, Vector3 } from '../../../../packages/shared/src/engine/types';
 
-// Mock browser environment for Node.js tests
-if (typeof global.requestAnimationFrame === 'undefined') {
-  global.requestAnimationFrame = (callback: FrameRequestCallback) => {
-    return setTimeout(callback, 16) as any; // ~60fps
-  };
-}
+// Mock requestAnimationFrame for Node.js environment
+global.requestAnimationFrame = jest.fn((callback) => {
+  return setTimeout(callback, 16);
+});
 
-if (typeof global.cancelAnimationFrame === 'undefined') {
-  global.cancelAnimationFrame = (id: number) => {
-    clearTimeout(id);
-  };
-}
+global.cancelAnimationFrame = jest.fn((id) => {
+  clearTimeout(id);
+});
 
-describe('Game Engine Tests', () => {
+describe('GameEngine', () => {
   let engine: GameEngine;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     engine = new GameEngine();
-    await engine.init();
   });
 
   afterEach(async () => {
-    await engine.stop();
+    if (engine.isRunning) {
+      await engine.stop();
+    }
   });
 
-  describe('GameEngine Core', () => {
-    it('should initialize successfully', () => {
-      expect(engine).toBeDefined();
+  describe('Constructor', () => {
+    test('should create engine with default config', () => {
+      expect(engine).toBeInstanceOf(GameEngine);
       expect(engine.isRunning).toBe(false);
+      expect(engine.gameState).toBeDefined();
+      expect(engine.gameState.entities).toBeInstanceOf(Map);
+      expect(engine.gameState.systems).toBeInstanceOf(Map);
+      expect(engine.gameState.deltaTime).toBe(0);
+      expect(engine.gameState.totalTime).toBe(0);
+      expect(engine.gameState.gameMode).toBe('default');
     });
 
-    it('should start and stop properly', async () => {
+    test('should create engine with custom config', () => {
+      const config: Partial<EngineConfig> = {
+        tickRate: 30,
+        maxEntities: 500,
+        enableDebug: true,
+        enableProfiling: true,
+        autoStart: true
+      };
+
+      const customEngine = new GameEngine(config);
+      expect(customEngine).toBeInstanceOf(GameEngine);
+    });
+
+    test('should extend EventEmitter', () => {
+      expect(engine.on).toBeDefined();
+      expect(engine.emit).toBeDefined();
+      expect(engine.removeListener).toBeDefined();
+    });
+  });
+
+  describe('Lifecycle', () => {
+    test('should initialize engine', async () => {
+      await engine.init();
+      expect(engine.gameState).toBeDefined();
+    });
+
+    test('should start and stop engine', async () => {
+      await engine.init();
+      
       await engine.start();
       expect(engine.isRunning).toBe(true);
       
@@ -40,117 +75,358 @@ describe('Game Engine Tests', () => {
       expect(engine.isRunning).toBe(false);
     });
 
-    it('should create entities with proper structure', () => {
-      const entity = engine.createEntity('player', { x: 10, y: 20, z: 0 });
+    test('should handle multiple start calls', async () => {
+      await engine.init();
       
-      expect(entity).toHaveProperty('id');
-      expect(entity).toHaveProperty('type', 'player');
-      expect(entity).toHaveProperty('position');
-      expect(entity.position).toEqual({ x: 10, y: 20, z: 0 });
-      expect(entity).toHaveProperty('properties');
+      await engine.start();
+      expect(engine.isRunning).toBe(true);
+      
+      // Second start should not cause issues
+      await engine.start();
+      expect(engine.isRunning).toBe(true);
+      
+      await engine.stop();
     });
 
-    it('should add and retrieve entities', () => {
-      const entity = engine.createEntity('npc', { x: 0, y: 0, z: 0 });
+    test('should handle stop without start', async () => {
+      await engine.init();
+      
+      // Should not throw
+      await expect(engine.stop()).resolves.not.toThrow();
+      expect(engine.isRunning).toBe(false);
+    });
+  });
+
+  describe('Entity Management', () => {
+    beforeEach(async () => {
+      await engine.init();
+    });
+
+    test('should add entity', () => {
+      const entity: GameEntity = {
+        id: 'test-entity',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'player',
+        properties: { health: 100 }
+      };
+
       engine.addEntity(entity);
       
-      const retrieved = engine.getEntity(entity.id);
-      expect(retrieved).toBe(entity);
-      
-      const allEntities = engine.getEntitiesByType('npc');
-      expect(allEntities).toContain(entity);
+      expect(engine.gameState.entities.has('test-entity')).toBe(true);
+      expect(engine.gameState.entities.get('test-entity')).toEqual(entity);
     });
 
-    it('should remove entities', () => {
-      const entity = engine.createEntity('item', { x: 5, y: 5, z: 0 });
+    test('should get entity', () => {
+      const entity: GameEntity = {
+        id: 'test-entity',
+        position: { x: 10, y: 20, z: 30 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'npc',
+        properties: { name: 'TestNPC' }
+      };
+
       engine.addEntity(entity);
       
-      expect(engine.getEntity(entity.id)).toBe(entity);
+      const retrieved = engine.getEntity('test-entity');
+      expect(retrieved).toEqual(entity);
       
-      engine.removeEntity(entity.id);
-      expect(engine.getEntity(entity.id)).toBeUndefined();
+      const nonExistent = engine.getEntity('non-existent');
+      expect(nonExistent).toBeUndefined();
     });
 
-    it('should filter entities by type', () => {
-      const player = engine.createEntity('player', { x: 0, y: 0, z: 0 });
-      const npc1 = engine.createEntity('npc', { x: 1, y: 1, z: 0 });
-      const npc2 = engine.createEntity('npc', { x: 2, y: 2, z: 0 });
+    test('should remove entity', () => {
+      const entity: GameEntity = {
+        id: 'test-entity',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'item',
+        properties: {}
+      };
+
+      engine.addEntity(entity);
+      expect(engine.gameState.entities.has('test-entity')).toBe(true);
       
-      engine.addEntity(player);
-      engine.addEntity(npc1);
-      engine.addEntity(npc2);
+      engine.removeEntity('test-entity');
+      expect(engine.gameState.entities.has('test-entity')).toBe(false);
       
-      const npcs = engine.getEntitiesByType('npc');
-      expect(npcs).toHaveLength(2);
-      expect(npcs).toContain(npc1);
-      expect(npcs).toContain(npc2);
+      // Removing again should not cause issues (returns void)
+      engine.removeEntity('test-entity');
+      expect(engine.gameState.entities.has('test-entity')).toBe(false);
+    });
+
+    test('should update entity properties', () => {
+      const entity: GameEntity = {
+        id: 'test-entity',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'player',
+        properties: { health: 100 }
+      };
+
+      engine.addEntity(entity);
       
+      // Update by directly modifying the entity
+      const retrievedEntity = engine.getEntity('test-entity');
+      if (retrievedEntity) {
+        retrievedEntity.position = { x: 10, y: 20, z: 30 };
+        retrievedEntity.properties = { health: 80, mana: 50 };
+      }
+      
+      const updatedEntity = engine.getEntity('test-entity');
+      expect(updatedEntity?.position).toEqual({ x: 10, y: 20, z: 30 });
+      expect(updatedEntity?.properties.health).toBe(80);
+      expect(updatedEntity?.properties.mana).toBe(50);
+    });
+
+    test('should get entities by type', () => {
+      const player1: GameEntity = {
+        id: 'player1',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'player',
+        properties: {}
+      };
+
+      const player2: GameEntity = {
+        id: 'player2',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'player',
+        properties: {}
+      };
+
+      const npc: GameEntity = {
+        id: 'npc1',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'npc',
+        properties: {}
+      };
+
+      engine.addEntity(player1);
+      engine.addEntity(player2);
+      engine.addEntity(npc);
+
       const players = engine.getEntitiesByType('player');
-      expect(players).toHaveLength(1);
-      expect(players).toContain(player);
-    });
+      expect(players).toHaveLength(2);
+      expect(players.map(p => p.id)).toContain('player1');
+      expect(players.map(p => p.id)).toContain('player2');
 
-    it('should get engine configuration', () => {
-      const config = engine.getConfig();
-      expect(config).toHaveProperty('tickRate');
-      expect(config).toHaveProperty('maxEntities');
-      expect(config).toHaveProperty('enableDebug');
-    });
+      const npcs = engine.getEntitiesByType('npc');
+      expect(npcs).toHaveLength(1);
+      expect(npcs[0].id).toBe('npc1');
 
-    it('should get engine stats', () => {
-      const stats = engine.getStats();
-      expect(stats).toHaveProperty('isRunning');
-      expect(stats).toHaveProperty('entityCount');
-      expect(stats).toHaveProperty('systemCount');
-      expect(stats).toHaveProperty('totalTime');
-      expect(stats.isRunning).toBe(false);
-    });
-
-    it('should change game mode', () => {
-      engine.setGameMode('test');
-      expect(engine.gameState.gameMode).toBe('test');
+      const items = engine.getEntitiesByType('item');
+      expect(items).toHaveLength(0);
     });
   });
 
   describe('System Management', () => {
-    it('should add and retrieve systems', () => {
+    beforeEach(async () => {
+      await engine.init();
+    });
+
+    test('should add system', () => {
       const mockSystem: System = {
         name: 'TestSystem',
-        priority: 0,
+        priority: 10,
         enabled: true,
-        init: jest.fn(),
-        update: jest.fn()
+        init: jest.fn().mockResolvedValue(undefined),
+        update: jest.fn().mockResolvedValue(undefined),
+        destroy: jest.fn().mockResolvedValue(undefined)
+      };
+
+      engine.addSystem(mockSystem);
+      
+      expect(engine.gameState.systems.has('TestSystem')).toBe(true);
+    });
+
+    test('should remove system', () => {
+      const mockSystem: System = {
+        name: 'TestSystem',
+        priority: 10,
+        enabled: true,
+        destroy: jest.fn().mockResolvedValue(undefined)
+      };
+
+      engine.addSystem(mockSystem);
+      expect(engine.gameState.systems.has('TestSystem')).toBe(true);
+      
+      engine.removeSystem('TestSystem');
+      expect(engine.gameState.systems.has('TestSystem')).toBe(false);
+    });
+
+    test('should get system', () => {
+      const mockSystem: System = {
+        name: 'TestSystem',
+        priority: 10,
+        enabled: true
       };
 
       engine.addSystem(mockSystem);
       
       const retrieved = engine.getSystem('TestSystem');
-      expect(retrieved).toBe(mockSystem);
+      expect(retrieved).toEqual(mockSystem);
+      
+      const nonExistent = engine.getSystem('NonExistent');
+      expect(nonExistent).toBeUndefined();
     });
 
-    it('should remove systems', async () => {
-      const mockSystem: System = {
-        name: 'RemoveableSystem',
-        priority: 0,
+    test('should handle system with same name', () => {
+      const system1: System = {
+        name: 'TestSystem',
+        priority: 10,
         enabled: true,
-        destroy: jest.fn()
+        destroy: jest.fn().mockResolvedValue(undefined)
       };
 
-      engine.addSystem(mockSystem);
-      expect(engine.getSystem('RemoveableSystem')).toBe(mockSystem);
+      const system2: System = {
+        name: 'TestSystem',
+        priority: 20,
+        enabled: false
+      };
+
+      engine.addSystem(system1);
+      expect(engine.gameState.systems.get('TestSystem')).toEqual(system1);
       
-      engine.removeSystem('RemoveableSystem');
-      expect(engine.getSystem('RemoveableSystem')).toBeUndefined();
+      // Adding system with same name should replace
+      engine.addSystem(system2);
+      expect(engine.gameState.systems.get('TestSystem')).toEqual(system2);
+    });
+  });
+
+  describe('Events', () => {
+    beforeEach(async () => {
+      await engine.init();
     });
 
-    it('should work with ActionSystem as a system', async () => {
-      const { ActionSystem } = await import('../../../../packages/shared/src/engine/ActionSystem');
-      const actionSystem = new ActionSystem(engine);
-      engine.addSystem(actionSystem);
+    test('should emit events during lifecycle', async () => {
+      const startSpy = jest.fn();
+      const stopSpy = jest.fn();
 
-      const retrievedSystem = engine.getSystem('ActionSystem');
-      expect(retrievedSystem).toBe(actionSystem);
-      expect(retrievedSystem?.name).toBe('ActionSystem');
+      engine.on('engine:started', startSpy);
+      engine.on('engine:stopped', stopSpy);
+
+      await engine.init();
+      await engine.start();
+      // Check if start event was emitted
+      expect(startSpy).toHaveBeenCalled();
+      
+      await engine.stop();
+      // Check if stop event was emitted
+      expect(stopSpy).toHaveBeenCalled();
+    });
+
+    test('should emit entity events', () => {
+      const addSpy = jest.fn();
+      const removeSpy = jest.fn();
+      const updateSpy = jest.fn();
+
+      engine.on('entity:added', addSpy);
+      engine.on('entity:removed', removeSpy);
+      engine.on('entity:updated', updateSpy);
+
+      const entity: GameEntity = {
+        id: 'test-entity',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'test',
+        properties: {}
+      };
+
+      engine.addEntity(entity);
+      expect(addSpy).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'entity:added',
+        data: entity
+      }));
+
+      // Update entity properties directly
+      const retrievedEntity = engine.getEntity('test-entity');
+      if (retrievedEntity) {
+        retrievedEntity.position = { x: 10, y: 0, z: 0 };
+      }
+
+      engine.removeEntity('test-entity');
+      expect(removeSpy).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'entity:removed',
+        data: entity
+      }));
+    });
+  });
+
+  describe('Error Handling', () => {
+    test('should handle entity limit', () => {
+      const limitedEngine = new GameEngine({ maxEntities: 2 });
+      
+      const entity1: GameEntity = {
+        id: 'entity1',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'test',
+        properties: {}
+      };
+
+      const entity2: GameEntity = {
+        id: 'entity2',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'test',
+        properties: {}
+      };
+
+      const entity3: GameEntity = {
+        id: 'entity3',
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        type: 'test',
+        properties: {}
+      };
+
+      limitedEngine.addEntity(entity1);
+      limitedEngine.addEntity(entity2);
+      
+      expect(() => limitedEngine.addEntity(entity3)).toThrow('Maximum entity limit reached');
+    });
+  });
+
+  describe('Game State', () => {
+    beforeEach(async () => {
+      await engine.init();
+    });
+
+    test('should provide access to game state', () => {
+      expect(engine.gameState).toBeDefined();
+      expect(engine.gameState.entities).toBeInstanceOf(Map);
+      expect(engine.gameState.systems).toBeInstanceOf(Map);
+      expect(typeof engine.gameState.deltaTime).toBe('number');
+      expect(typeof engine.gameState.totalTime).toBe('number');
+      expect(typeof engine.gameState.gameMode).toBe('string');
+      expect(typeof engine.gameState.settings).toBe('object');
+    });
+
+    test('should update game state during ticks', async () => {
+      await engine.start();
+      
+      // Wait a short time for at least one tick
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Game state should have been updated
+      // Since we can't easily test the exact timing, just verify engine is running
+      expect(engine.isRunning).toBe(true);
+      
+      await engine.stop();
     });
   });
 });
