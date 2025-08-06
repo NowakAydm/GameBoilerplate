@@ -77,7 +77,9 @@ export function R3FScene({
   playerName,
   showStatusInfo = false,
   isAuthenticated = false,
-  onLogout
+  onLogout,
+  onOpenSettings,
+  orbitControlsProps
 }: {
   mode: '2d' | '3d';
   entities: SimpleEntity[];
@@ -89,6 +91,8 @@ export function R3FScene({
   showStatusInfo?: boolean;
   isAuthenticated?: boolean;
   onLogout?: () => void;
+  onOpenSettings?: () => void;
+  orbitControlsProps?: any;
 }) {
 
   // Button click handler
@@ -131,6 +135,7 @@ export function R3FScene({
           enableRotate={mode === '3d'}
           enableZoom={true}
           enablePan={true}
+          {...orbitControlsProps}
         />
       </Canvas>
       
@@ -186,12 +191,38 @@ export function R3FScene({
         </button>
       )}
 
+      {/* Settings Button - Top Right */}
+      {onOpenSettings && (
+        <button
+          onClick={onOpenSettings}
+          style={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            padding: '8px 12px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            backgroundColor: '#6c757d',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            zIndex: 10,
+            pointerEvents: 'auto',
+          }}
+        >
+          ⚙️ Settings
+        </button>
+      )}
+
       {/* Status Info - Top Right */}
       {showStatusInfo && (
         <div
           style={{
             position: 'absolute',
-            top: 16,
+            top: 60, // Move down to make room for settings button
             right: 16,
             backgroundColor: 'rgba(255, 255, 255, 0.9)',
             padding: '12px',

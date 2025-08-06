@@ -3,18 +3,24 @@ import { io, Socket } from 'socket.io-client';
 // Use local types to avoid Three.js conflicts
 import type { GameAction } from './types/local';
 import { AuthComponent } from './components/AuthComponent';
+import { SettingsModal } from './components/SettingsModal';
 import { useAuthStore } from './stores/authStore';
+import { useControlsStore } from './stores/controlsStore';
+import { useGameKeyboardControls } from './components/shared/useGameKeyboardControls';
+import { useGameTouchControls } from './components/shared/useGameTouchControls';
 import { R3FScene, SimpleEntity } from './components/shared/R3FRenderer';
 import { transformGameStateToEntities } from './components/shared/gameUtils';
 
 export default function App() {
   const { token, isAuthenticated, user, logout } = useAuthStore();
+  const { controlSettings, updateControlSettings } = useControlsStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameState, setGameState] = useState<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<
     'disconnected' | 'connecting' | 'connected'
   >('disconnected');
   const [is3DMode, setIs3DMode] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Connect to WebSocket when authenticated
   useEffect(() => {
@@ -74,6 +80,25 @@ export default function App() {
     }
   };
 
+  const handleMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+    sendGameAction({ type: 'move', direction, distance: 1, speed: 1 });
+  };
+
+  // Set up keyboard controls
+  useGameKeyboardControls({
+    controls: controlSettings.keyboard,
+    onMove: handleMove,
+    enabled: isAuthenticated && connectionStatus === 'connected' && !isSettingsOpen,
+  });
+
+  // Set up touch controls
+  const { getOrbitControlsProps } = useGameTouchControls({
+    controls: controlSettings.touch,
+    enabled: !isSettingsOpen,
+  });
+
+  const orbitControlsProps = getOrbitControlsProps();
+
   // Transform game state to entities for R3F rendering
   const entities = transformGameStateToEntities(gameState, user, connectionStatus);
 
@@ -92,12 +117,22 @@ export default function App() {
             entities={entities}
             connectionStatus={connectionStatus}
             onModeSwitch={() => setIs3DMode(!is3DMode)}
-            onMove={(direction) => sendGameAction({ type: 'move', direction, distance: 1, speed: 1 })}
+            onMove={handleMove}
             showMoveButtons={isAuthenticated && connectionStatus === 'connected'}
             playerName={user?.username}
             showStatusInfo={true}
             isAuthenticated={isAuthenticated}
             onLogout={logout}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            orbitControlsProps={orbitControlsProps}
+          />
+          
+          {/* Settings Modal */}
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            controlSettings={controlSettings}
+            onControlSettingsChange={updateControlSettings}
           />
           
           {/* Authentication Modal - Center of canvas when not authenticated */}

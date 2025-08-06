@@ -23,6 +23,7 @@
     "test:coverage": "cd ../../tests && npm run test:shared:coverage"
   },
   "dependencies": {
-    "zod": "^4.0.14"
+    "@types/node": "^24.2.0",
+    "zod": "^4.0.15"
   }
 }
