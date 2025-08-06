@@ -7,46 +7,32 @@ This document outlines the architecture of the GameBoilerplate engine, its core 
 The GameBoilerplate engine is a modular, event-driven game engine designed for multiplayer games with real-time state management. It follows an Entity-Component-System (ECS) architecture with plugin support.
 
 ## Core Architecture
-
 ```mermaid
-graph TB
-    subgraph "Client Applications"
-        WebClient[Web Client]
-        MobileClient[Mobile Client]
-        DesktopClient[Desktop Client]
-    end
-    
-    subgraph "Game Engine Core"
-        GameEngine[Game Engine]
-        GameState[Game State]
-        EventSystem[Event System]
-    end
-    
-    subgraph "System Layer"
-        ActionSystem[Action System]
-        PluginSystem[Plugin System]
-        SceneManager[Scene Manager]
-        TickSystem[Tick System]
-        NetworkSystem[Network System]
-    end
-    
-    subgraph "Server Infrastructure"
-        GameServer[Game Server]
-        Database[(Database)]
-        AdminPanel[Admin Panel]
-    end
-    
+graph TD
+    WebClient[Web Client]
+    MobileClient[Mobile Client]
+    DesktopClient[Desktop Client]
+    GameEngine[Game Engine]
+    GameState[Game State]
+    EventSystem[Event System]
+    ActionSystem[Action System]
+    PluginSystem[Plugin System]
+    SceneManager[Scene Manager]
+    TickSystem[Tick System]
+    NetworkSystem[Network System]
+    GameServer[Game Server]
+    Database[(Database)]
+    AdminPanel[Admin Panel]
+
     WebClient --> GameEngine
     MobileClient --> GameEngine
     DesktopClient --> GameEngine
-    
     GameEngine --> GameState
     GameEngine --> EventSystem
     GameEngine --> ActionSystem
     GameEngine --> PluginSystem
     GameEngine --> SceneManager
     GameEngine --> TickSystem
-    
     ActionSystem --> NetworkSystem
     NetworkSystem --> GameServer
     GameServer --> Database
@@ -59,22 +45,23 @@ graph TB
 The central orchestrator that manages all systems, entities, and game state.
 
 ```mermaid
-graph LR
-    subgraph "GameEngine Lifecycle"
-        Init[Initialize] --> Start[Start]
-        Start --> Update[Update Loop]
-        Update --> Update
-        Update --> Stop[Stop]
-        Stop --> Cleanup[Cleanup]
-    end
-    
-    subgraph "Engine Responsibilities"
-        SystemMgmt[System Management]
-        EntityMgmt[Entity Management]
-        EventMgmt[Event Management]
-        StateMgmt[State Management]
-    end
-    
+graph TD
+    Init[Initialize]
+    Start[Start]
+    Update[Update Loop]
+    Stop[Stop]
+    Cleanup[Cleanup]
+    SystemMgmt[System Management]
+    EntityMgmt[Entity Management]
+    EventMgmt[Event Management]
+    StateMgmt[State Management]
+
+    Init --> Start
+    Start --> Update
+    Update --> Update
+    Update --> Stop
+    Stop --> Cleanup
+
     Init --> SystemMgmt
     Start --> EntityMgmt
     Update --> EventMgmt
@@ -84,25 +71,26 @@ graph LR
 ### Game State
 Centralized state container that holds all game data.
 
-```mermaid
-graph TD
-    GameState --> Entities[Entities Map]
-    GameState --> Systems[Systems Map]
-    GameState --> GameMode[Game Mode]
-    GameState --> Settings[Settings]
-    GameState --> TimeData[Time Data]
-    
-    Entities --> Entity1[Entity: Player]
-    Entities --> Entity2[Entity: NPC]
-    Entities --> Entity3[Entity: Item]
-    
-    Systems --> System1[Farming System]
-    Systems --> System2[Combat System]
-    Systems --> System3[Inventory System]
-    
-    TimeData --> DeltaTime[Delta Time]
-    TimeData --> TotalTime[Total Time]
-```
+- **Entities Map**: [
+    'Player',
+    'NPC',
+    'Item',
+    // ...other entity types
+  ]
+- **Systems Map**: [
+    'Farming System',
+    'Combat System',
+    'Inventory System',
+    // ...other systems
+  ]
+- **Game Mode**: Current game mode or ruleset
+- **Settings**: Game configuration and settings
+- **Time Data**: {
+    deltaTime: <number>,
+    totalTime: <number>
+  }
+
+Entities are categorized (players, NPCs, items), and systems manage different aspects of gameplay. Time data tracks the progression of the game.
 
 ## System Architecture
 
@@ -134,70 +122,46 @@ sequenceDiagram
 ```
 
 ### Plugin System
-Enables modular functionality through plugins.
+The plugin system enables modular functionality:
 
-```mermaid
-graph TB
-    subgraph "Plugin Lifecycle"
-        Discover[Discover Plugins]
-        Install[Install Plugin]
-        Register[Register Systems/Actions]
-        Runtime[Runtime Operations]
-        Uninstall[Uninstall Plugin]
-    end
-    
-    subgraph "Plugin Components"
-        PluginCode[Plugin Code]
-        Systems[Custom Systems]
-        Actions[Custom Actions]
-        Dependencies[Dependencies]
-    end
-    
-    Discover --> Install
-    Install --> Register
-    Register --> Runtime
-    Runtime --> Uninstall
-    
-    PluginCode --> Systems
-    PluginCode --> Actions
-    PluginCode --> Dependencies
-```
+- **Lifecycle**:
+  1. Discover plugins
+  2. Install plugin
+  3. Register systems/actions
+  4. Runtime operations
+  5. Uninstall plugin
+
+- **Components**:
+  - Plugin Code
+  - Custom Systems
+  - Custom Actions
+  - Dependencies
+
+This allows developers to extend or modify engine functionality without changing the core codebase.
 
 ## Entity-Component-System Pattern
-
 ```mermaid
-graph LR
-    subgraph "Entities"
-        Player[Player Entity]
-        NPC[NPC Entity]
-        Item[Item Entity]
-    end
-    
-    subgraph "Components"
-        Position[Position Component]
-        Health[Health Component]
-        Inventory[Inventory Component]
-        Renderable[Renderable Component]
-    end
-    
-    subgraph "Systems"
-        MovementSys[Movement System]
-        CombatSys[Combat System]
-        RenderSys[Render System]
-        InventorySys[Inventory System]
-    end
-    
+graph TD
+    Player[Player Entity]
+    NPC[NPC Entity]
+    Item[Item Entity]
+    Position[Position Component]
+    Health[Health Component]
+    Inventory[Inventory Component]
+    Renderable[Renderable Component]
+    MovementSys[Movement System]
+    CombatSys[Combat System]
+    RenderSys[Render System]
+    InventorySys[Inventory System]
+
     Player --> Position
     Player --> Health
     Player --> Inventory
-    
     NPC --> Position
     NPC --> Health
     NPC --> Renderable
-    
     Item --> Position
     Item --> Renderable
-    
     Position --> MovementSys
     Health --> CombatSys
     Renderable --> RenderSys
@@ -227,103 +191,53 @@ sequenceDiagram
 ```
 
 ## Plugin Development Flow
+The typical plugin development flow is as follows:
 
-```mermaid
-graph TD
-    Start[Start Plugin Development]
-    Define[Define Plugin Interface]
-    Implement[Implement Plugin Class]
-    Systems[Create Custom Systems]
-    Actions[Register Actions]
-    Test[Test Plugin]
-    Package[Package Plugin]
-    Deploy[Deploy to Engine]
-    
-    Start --> Define
-    Define --> Implement
-    Implement --> Systems
-    Implement --> Actions
-    Systems --> Test
-    Actions --> Test
-    Test --> Package
-    Package --> Deploy
-    
-    subgraph "Plugin Structure"
-        Interface[GamePlugin Interface]
-        Install[install() method]
-        Uninstall[uninstall() method]
-        Systems2[Custom Systems]
-        Actions2[Action Definitions]
-    end
-    
-    Define --> Interface
-    Implement --> Install
-    Implement --> Uninstall
-    Systems --> Systems2
-    Actions --> Actions2
+1. **Start Plugin Development**
+2. **Define Plugin Interface** (e.g., `GamePlugin` interface)
+3. **Implement Plugin Class**
+    - `install()` method
+    - `uninstall()` method
+4. **Create Custom Systems**
+5. **Register Actions**
+6. **Test Plugin**
+7. **Package Plugin**
+8. **Deploy to Engine**
+
+Plugin Structure Example:
+```typescript
+interface GamePlugin {
+  install(engine: GameEngine): void;
+  uninstall(engine: GameEngine): void;
+  systems?: CustomSystem[];
+  actions?: ActionDefinition[];
+}
 ```
 
 ## Planned Usage Patterns
 
 ### 1. Game Development Workflow
+The game development workflow typically follows these phases:
 
-```mermaid
-graph LR
-    subgraph "Development Phase"
-        Design[Game Design]
-        Prototype[Prototype Systems]
-        Plugin[Create Plugins]
-        Test[Test Integration]
-    end
-    
-    subgraph "Deployment Phase"
-        Build[Build Application]
-        Deploy[Deploy Server]
-        Monitor[Monitor Performance]
-        Update[Update Systems]
-    end
-    
-    Design --> Prototype
-    Prototype --> Plugin
-    Plugin --> Test
-    Test --> Build
-    Build --> Deploy
-    Deploy --> Monitor
-    Monitor --> Update
-    Update --> Plugin
-```
+**Development Phase:**
+- Game Design
+- Prototype Systems
+- Create Plugins
+- Test Integration
+
+**Deployment Phase:**
+- Build Application
+- Deploy Server
+- Monitor Performance
+- Update Systems
+
+The process is iterative, with updates leading back to plugin creation and further testing.
 
 ### 2. Runtime Game Loop
-
 ```mermaid
 graph TD
-    Start[Game Start]
-    Init[Initialize Engine]
-    LoadSystems[Load Systems]
-    LoadPlugins[Load Plugins]
-    LoadScene[Load Initial Scene]
-    GameLoop[Game Loop]
-    
-    Start --> Init
-    Init --> LoadSystems
-    LoadSystems --> LoadPlugins
-    LoadPlugins --> LoadScene
-    LoadScene --> GameLoop
-    
-    subgraph "Game Loop Details"
-        Input[Process Input]
-        Actions[Handle Actions]
-        Update[Update Systems]
-        Render[Render Frame]
-        Network[Sync Network]
-    end
-    
-    GameLoop --> Input
-    Input --> Actions
-    Actions --> Update
-    Update --> Render
-    Render --> Network
-    Network --> Input
+    Start[Game Start] --> Init[Initialize Engine] --> LoadSystems[Load Systems] --> LoadPlugins[Load Plugins] --> LoadScene[Load Initial Scene] --> GameLoop[Game Loop]
+    GameLoop --> Input[Process Input] --> Actions[Handle Actions] --> Update[Update Systems] --> Render[Render Frame] --> Network[Sync Network] --> Input
 ```
 
 ### 3. Multiplayer State Synchronization
@@ -369,34 +283,22 @@ sequenceDiagram
 - **Load Balancing**: Distribute player load
 
 ## Future Enhancements
+Planned future enhancements for the engine include:
 
-```mermaid
-graph TB
-    Current[Current Engine]
-    
-    subgraph "Planned Features"
-        AI[AI System Integration]
-        Physics[Physics Engine]
-        Graphics[Advanced Graphics]
-        Mobile[Mobile Optimization]
-        Cloud[Cloud Integration]
-        Analytics[Analytics Dashboard]
-    end
-    
-    Current --> AI
-    Current --> Physics
-    Current --> Graphics
-    Current --> Mobile
-    Current --> Cloud
-    Current --> Analytics
-    
-    AI --> MachineLearning[Machine Learning NPCs]
-    Physics --> Collision[Collision Detection]
-    Graphics --> Shaders[Custom Shaders]
-    Mobile --> Touch[Touch Controls]
-    Cloud --> Storage[Cloud Storage]
-    Analytics --> Metrics[Performance Metrics]
-```
+- **AI System Integration**
+  - Machine Learning NPCs
+- **Physics Engine**
+  - Collision Detection
+- **Advanced Graphics**
+  - Custom Shaders
+- **Mobile Optimization**
+  - Touch Controls
+- **Cloud Integration**
+  - Cloud Storage
+- **Analytics Dashboard**
+  - Performance Metrics
+
+These features will build on the current engine to expand capabilities and performance.
 
 ## Getting Started
 
