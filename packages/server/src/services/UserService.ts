@@ -18,6 +18,7 @@ export interface IUser {
       y: number;
       z: number;
     };
+    settings?: any[];
     lastUpdated?: Date;
   };
   createdAt: Date;
@@ -234,7 +235,16 @@ export class UserService implements IUserService {
       { new: true }
     );
     
-    return userDoc ? userDoc.toObject() : null;
+    // Handle both mock and real Mongoose models
+    if (!userDoc) return null;
+    
+    // If it's a Mongoose document, convert to object
+    if (typeof userDoc.toObject === 'function') {
+      return userDoc.toObject();
+    }
+    
+    // If it's already a plain object (mock model), return as is
+    return userDoc;
   }
 
   /**

@@ -29,7 +29,10 @@ function UnifiedR3FView({
   mode 
 }: GameVisualizationProps & { mode: '2d' | '3d' }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { controlSettings, updateControlSettings } = useControlsStore();
+  const { 
+    controlSettings, 
+    setSettings 
+  } = useControlsStore();
   
   // Transform game state into entities for R3F rendering
   const entities = transformGameStateToEntities(gameState, user, connectionStatus);
@@ -82,7 +85,7 @@ function UnifiedR3FView({
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         controlSettings={controlSettings}
-        onControlSettingsChange={updateControlSettings}
+        onControlSettingsChange={(settings) => setSettings(settings, true)}
       />
       
       {/* Game State Text */}

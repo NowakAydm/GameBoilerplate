@@ -16,6 +16,7 @@ export interface IUser extends Document {
       y: number;
       z: number;
     };
+    settings?: any[];
     lastUpdated?: Date;
   };
   createdAt: Date;
@@ -55,6 +56,7 @@ const UserSchema = new Schema<IUser>(
         experience: 0,
         inventory: [],
         position: { x: 0, y: 0, z: 0 },
+        settings: [],
         lastUpdated: new Date()
       })
     },
@@ -183,8 +185,40 @@ class MockUserModel {
     const userIndex = mockUsers.findIndex(user => user._id === id);
     if (userIndex === -1) return null;
     
-    mockUsers[userIndex] = { ...mockUsers[userIndex], ...update };
-    return mockUsers[userIndex];
+    // Handle MongoDB $set operations
+    if (update.$set) {
+      const setOperations = update.$set;
+      const updatedUser = { ...mockUsers[userIndex] } as any;
+      
+      // Apply dot notation updates
+      Object.entries(setOperations).forEach(([key, value]) => {
+        if (key.includes('.')) {
+          // Handle nested properties like 'gameData.settings'
+          const parts = key.split('.');
+          let current = updatedUser as any;
+          
+          // Navigate to the parent object
+          for (let i = 0; i < parts.length - 1; i++) {
+            if (!current[parts[i]]) {
+              current[parts[i]] = {};
+            }
+            current = current[parts[i]];
+          }
+          
+          // Set the final value
+          current[parts[parts.length - 1]] = value;
+        } else {
+          (updatedUser as any)[key] = value;
+        }
+      });
+      
+      mockUsers[userIndex] = updatedUser;
+      return updatedUser;
+    } else {
+      // Simple update without $set
+      mockUsers[userIndex] = { ...mockUsers[userIndex], ...update };
+      return mockUsers[userIndex];
+    }
   }
 
   static async deleteOne(filter: any): Promise<{ deletedCount: number }> {

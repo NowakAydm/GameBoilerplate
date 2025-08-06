@@ -13,7 +13,11 @@ import { transformGameStateToEntities } from './components/shared/gameUtils';
 
 export default function App() {
   const { token, isAuthenticated, user, logout } = useAuthStore();
-  const { controlSettings, updateControlSettings } = useControlsStore();
+  const { 
+    controlSettings, 
+    loadSettingsFromServer,
+    setSettings 
+  } = useControlsStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameState, setGameState] = useState<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<
@@ -44,6 +48,11 @@ export default function App() {
         console.log('Game update:', data);
         if (data.gameState) {
           setGameState(data.gameState);
+        }
+        
+        // Load settings from user's game data if available
+        if (data.user?.gameData) {
+          loadSettingsFromServer(data.user.gameData);
         }
       });
 
@@ -132,7 +141,7 @@ export default function App() {
             isOpen={isSettingsOpen}
             onClose={() => setIsSettingsOpen(false)}
             controlSettings={controlSettings}
-            onControlSettingsChange={updateControlSettings}
+            onControlSettingsChange={(settings) => setSettings(settings, true)}
           />
           
           {/* Authentication Modal - Center of canvas when not authenticated */}

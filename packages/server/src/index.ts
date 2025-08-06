@@ -18,6 +18,7 @@ import { AntiCheatService } from './services/AntiCheatService';
 import { metricsTracker } from './services/MetricsService';
 import { backupService } from './services/BackupService';
 import { gameDataService } from './services/GameDataService';
+import { UserService } from './services/UserService';
 import { persistenceSystem } from './engine/PersistenceSystem';
 
 // API Routes
@@ -30,6 +31,9 @@ import { authenticateToken } from './middleware/auth';
 
 // Load environment variables
 dotenv.config();
+
+// Create service instances
+const userService = new UserService();
 
 const app = express();
 const server = http.createServer(app);
@@ -138,7 +142,7 @@ io.on('connection', async (socket) => {
   // Initialize player game data
   await gameDataService.initializePlayer(user.userId);
 
-  socket.on('gameAction', (action) => {
+  socket.on('gameAction', async (action) => {
     // Sanitize and validate input using shared schema
     const result = GameActionSchema.safeParse(action);
     if (!result.success) {
@@ -176,12 +180,16 @@ io.on('connection', async (socket) => {
     // Track game action in metrics for real-time statistics
     metricsTracker.trackGameAction(user.userId, sanitizedAction.type);
 
+    // Get user's game data for the payload
+    const userGameData = await userService.getUserGameData(user.userId);
+
     // Broadcast valid actions
     io.emit('gameUpdate', {
       user: {
         id: user.userId,
         role: user.role,
         isGuest: user.isGuest,
+        gameData: userGameData,
       },
       action: sanitizedAction,
       gameState: AntiCheatService.getUserState(user.userId),

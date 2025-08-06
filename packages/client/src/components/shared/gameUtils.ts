@@ -21,7 +21,9 @@ export const DEFAULT_CONTROL_SETTINGS: ControlSettings = {
 
 // Utility function to get control settings from user game data
 export function getControlSettings(gameData: any): ControlSettings {
-  return gameData?.controlSettings || DEFAULT_CONTROL_SETTINGS;
+  // Look for controls settings in the settings array
+  const controlsSettings = gameData?.settings?.find((setting: any) => setting.tab === 'Controls');
+  return controlsSettings?.settings || DEFAULT_CONTROL_SETTINGS;
 }
 
 // Utility function to merge control settings with defaults
