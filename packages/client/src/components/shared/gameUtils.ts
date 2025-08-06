@@ -1,4 +1,44 @@
 import { SimpleEntity } from './R3FRenderer';
+import type { ControlSettings, KeyboardControls, TouchControls } from '@gameboilerplate/shared';
+
+// Default control settings
+export const DEFAULT_CONTROL_SETTINGS: ControlSettings = {
+  keyboard: {
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+  },
+  touch: {
+    panEnabled: true,
+    rotateEnabled: true,
+    zoomEnabled: true,
+    panSensitivity: 1,
+    rotateSensitivity: 1,
+    zoomSensitivity: 1,
+  },
+};
+
+// Utility function to get control settings from user game data
+export function getControlSettings(gameData: any): ControlSettings {
+  return gameData?.controlSettings || DEFAULT_CONTROL_SETTINGS;
+}
+
+// Utility function to merge control settings with defaults
+export function mergeControlSettings(
+  current: Partial<ControlSettings> = {}
+): ControlSettings {
+  return {
+    keyboard: {
+      ...DEFAULT_CONTROL_SETTINGS.keyboard,
+      ...current.keyboard,
+    },
+    touch: {
+      ...DEFAULT_CONTROL_SETTINGS.touch,
+      ...current.touch,
+    },
+  };
+}
 
 // Utility function to transform game state to R3F entities
 export function transformGameStateToEntities(

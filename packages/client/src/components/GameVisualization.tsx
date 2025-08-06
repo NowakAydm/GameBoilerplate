@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import type { GameAction } from '../types/local';
 import { R3FScene } from './shared/R3FRenderer';
+import { SettingsModal } from './SettingsModal';
+import { useGameKeyboardControls } from './shared/useGameKeyboardControls';
+import { useGameTouchControls } from './shared/useGameTouchControls';
+import { useControlsStore } from '../stores/controlsStore';
 import { 
   transformGameStateToEntities, 
   formatPosition, 
@@ -24,6 +28,9 @@ function UnifiedR3FView({
   isAuthenticated,
   mode 
 }: GameVisualizationProps & { mode: '2d' | '3d' }) {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { controlSettings, updateControlSettings } = useControlsStore();
+  
   // Transform game state into entities for R3F rendering
   const entities = transformGameStateToEntities(gameState, user, connectionStatus);
 
@@ -32,6 +39,25 @@ function UnifiedR3FView({
       sendGameAction(action);
     }
   };
+
+  const handleMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+    handleGameAction({ type: 'move', direction, distance: 1, speed: 1 });
+  };
+
+  // Set up keyboard controls
+  useGameKeyboardControls({
+    controls: controlSettings.keyboard,
+    onMove: handleMove,
+    enabled: isAuthenticated && connectionStatus === 'connected' && !isSettingsOpen,
+  });
+
+  // Set up touch controls
+  const { getOrbitControlsProps } = useGameTouchControls({
+    controls: controlSettings.touch,
+    enabled: !isSettingsOpen,
+  });
+
+  const orbitControlsProps = getOrbitControlsProps();
 
   return (
     <div style={{ 
@@ -47,6 +73,16 @@ function UnifiedR3FView({
         mode={mode}
         entities={entities}
         connectionStatus={connectionStatus}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        orbitControlsProps={orbitControlsProps}
+      />
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        controlSettings={controlSettings}
+        onControlSettingsChange={updateControlSettings}
       />
       
       {/* Game State Text */}
@@ -63,6 +99,14 @@ function UnifiedR3FView({
           <p><strong>Position:</strong> {formatPosition(gameState, user)}</p>
         )}
         <p><strong>Mode:</strong> {mode.toUpperCase()}</p>
+        {isAuthenticated && connectionStatus === 'connected' && (
+          <p style={{ fontSize: '12px', color: '#666' }}>
+            Use {controlSettings.keyboard.up.replace('Key', '').replace('Arrow', '→')}/
+            {controlSettings.keyboard.down.replace('Key', '').replace('Arrow', '↓')}/
+            {controlSettings.keyboard.left.replace('Key', '').replace('Arrow', '←')}/
+            {controlSettings.keyboard.right.replace('Key', '').replace('Arrow', '→')} to move
+          </p>
+        )}
       </div>
 
       {/* Game Action Buttons - Only show when connected */}
