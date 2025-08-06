@@ -1,10 +1,14 @@
 import { z } from 'zod';
+export type { ControlSettings, KeyboardControls, TouchControls } from './controlTypes';
 
 // Re-export zod for convenience
 export { z };
 
 // Export engine components
 export * from './engine';
+
+// Control settings types
+export * from './controlTypes';
 
 // Shared types, schemas, and utilities will go here.
 
